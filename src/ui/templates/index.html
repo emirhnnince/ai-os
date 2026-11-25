@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI OS — Akıllı Canlı İşletim Sistemi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060810;
+            --text: #f0f4ff;
+            --muted: #7a8ba8;
+            --accent: #00d4ff;
+            --purple: #9b59f7;
+            --gold: #ffb300;
+            --green: #00ffb3;
+            --glass: rgba(255,255,255,0.03);
+            --glass-b: rgba(255,255,255,0.07);
+            --radius: 18px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { width: 100%; height: 100%; overflow: hidden; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* ─── AMBIENT BG ─── */
+        .ambient {
+            position: fixed; inset: 0; pointer-events: none; z-index: 0;
+            background: 
+                radial-gradient(ellipse 60% 50% at 50% 30%, rgba(0,180,255,0.07) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(155,89,247,0.05) 0%, transparent 70%);
+        }
+
+        /* ─── TOP NAV ─── */
+        .top-nav {
+            position: relative; z-index: 20;
+            width: 100%; max-width: 1200px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 32px;
+        }
+        .logo {
+            font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent), 0 0 25px var(--accent);
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+        .nav-pills { display: flex; gap: 10px; align-items: center; }
+        .nav-pill {
+            padding: 7px 15px; border-radius: 50px;
+            border: 1px solid var(--glass-b);
+            background: var(--glass);
+            font-size: 0.78rem; font-weight: 500; color: var(--muted);
+            cursor: pointer; transition: all 0.25s;
+        }
+        .nav-pill:hover, .nav-pill.active {
+            background: rgba(0,212,255,0.1);
+            border-color: rgba(0,212,255,0.3);
+            color: var(--accent);
+        }
+        .status-indicator {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.75rem; color: var(--muted);
+        }
+        .status-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: status-blink 3s ease-in-out infinite;
+        }
+        @keyframes status-blink {
+            0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+        }
+
+        /* ─── CENTER ZONE ─── */
+        .center-zone {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 24px; flex: 1;
+            justify-content: center;
+        }
+
+        /* ─── WEBGL CANVAS ─── */
+        #orbCanvas {
+            width: 320px; height: 320px;
+            border-radius: 50%;
+            cursor: crosshair;
+            filter: drop-shadow(0 0 60px rgba(0,180,255,0.4));
+            transition: filter 0.5s;
+        }
+        #orbCanvas.listening { filter: drop-shadow(0 0 80px rgba(0,255,180,0.6)); }
+        #orbCanvas.thinking  { filter: drop-shadow(0 0 80px rgba(155,89,247,0.6)); }
+        #orbCanvas.speaking  { filter: drop-shadow(0 0 90px rgba(0,212,255,0.7)); }
+
+        /* ─── STATE LABEL ─── */
+        .state-label {
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 2.5px;
+            text-transform: uppercase; color: var(--accent);
+            opacity: 0.7; transition: color 0.4s;
+        }
+
+        /* ─── CHAT BUBBLE ─── */
+        .chat-bubble-wrap {
+            max-width: 560px; width: 90%; min-height: 52px;
+            background: var(--glass); border: 1px solid var(--glass-b);
+            border-radius: 20px; padding: 14px 20px;
+            font-size: 0.9rem; line-height: 1.6; color: var(--text);
+            transition: all 0.4s; position: relative; overflow: hidden;
+        }
+        .chat-bubble-wrap::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(0,212,255,0.04), transparent);
+            pointer-events: none;
+        }
+        .typing-cursor {
+            display: inline-block; width: 2px; height: 1em;
+            background: var(--accent); margin-left: 2px; vertical-align: text-bottom;
+            animation: blink-cursor 0.8s step-end infinite;
+        }
+        @keyframes blink-cursor { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ─── BOTTOM BAR ─── */
+        .bottom-bar {
+            position: relative; z-index: 20;
+            width: 100%; max-width: 680px;
+            padding: 0 20px 28px;
+            display: flex; flex-direction: column; gap: 12px; align-items: center;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+        }
+        .qa-pill {
+            padding: 6px 14px; border-radius: 50px;
+            border: 1px solid var(--glass-b); background: var(--glass);
+            font-size: 0.75rem; color: var(--muted); cursor: pointer;
+            transition: all 0.2s;
+        }
+        .qa-pill:hover {
+            background: rgba(0,212,255,0.08);
+            border-color: rgba(0,212,255,0.25); color: var(--accent);
+        }
+
+        /* Input Row */
+        .input-row {
+            display: flex; gap: 10px; width: 100%; align-items: center;
+        }
+        .msg-input {
+            flex: 1; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-b); border-radius: 50px;
+            padding: 13px 20px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 0.9rem;
+            outline: none; transition: all 0.25s;
+        }
+        .msg-input::placeholder { color: var(--muted); }
+        .msg-input:focus {
+            border-color: rgba(0,212,255,0.4);
+            background: rgba(0,212,255,0.04);
+            box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+        }
+
+        .icon-btn {
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 1px solid var(--glass-b); background: var(--glass);
+            color: var(--muted); cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: all 0.25s; font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .icon-btn:hover {
+            background: rgba(0,212,255,0.1);
+            border-color: rgba(0,212,255,0.3); color: var(--accent);
+        }
+        .send-btn {
+            background: linear-gradient(135deg, #00aaff, #9b59f7);
+            border: none; color: white;
+        }
+        .send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+
+        .mic-btn { position: relative; }
+        .mic-btn.listening {
+            background: rgba(0,255,180,0.15);
+            border-color: var(--green); color: var(--green);
+            animation: mic-ring 1.5s ease-in-out infinite;
+        }
+        @keyframes mic-ring {
+            0%,100% { box-shadow: 0 0 0 0 rgba(0,255,180,0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(0,255,180,0); }
+        }
+
+        /* ─── MODALS ─── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(12px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal {
+            background: rgba(10,14,25,0.98);
+            border: 1px solid var(--glass-b);
+            border-radius: 24px; padding: 32px;
+            max-width: 540px; width: 90%; max-height: 85vh; overflow-y: auto;
+            transform: translateY(20px) scale(0.98);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.open .modal { transform: none; }
+        .modal-title {
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .modal-close {
+            margin-left: auto; cursor: pointer; color: var(--muted);
+            font-size: 1.3rem; transition: color 0.2s;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        /* Form elements */
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+        input, select {
+            width: 100%; padding: 11px 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-b); border-radius: 12px;
+            color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.88rem;
+            outline: none; transition: border-color 0.2s;
+        }
+        input:focus, select:focus { border-color: rgba(0,212,255,0.4); }
+        select option { background: #0a0e19; }
+
+        .btn-primary {
+            width: 100%; padding: 12px; border-radius: 12px;
+            background: linear-gradient(135deg, #00aaff, #9b59f7);
+            border: none; color: white; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.85; }
+        .btn-secondary {
+            width: 100%; padding: 12px; border-radius: 12px;
+            background: var(--glass); border: 1px solid var(--glass-b);
+            color: var(--muted); font-size: 0.9rem; cursor: pointer;
+            transition: all 0.2s; margin-top: 10px;
+        }
+        .btn-secondary:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+
+        /* Oboard tabs */
+        .ob-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .ob-tab {
+            flex: 1; padding: 10px; border-radius: 12px;
+            border: 1px solid var(--glass-b); background: var(--glass);
+            color: var(--muted); font-size: 0.82rem; font-weight: 500;
+            cursor: pointer; text-align: center; transition: all 0.2s;
+        }
+        .ob-tab.active {
+            background: rgba(0,212,255,0.12);
+            border-color: rgba(0,212,255,0.3); color: var(--accent);
+        }
+
+        /* Settings sections */
+        .settings-section { margin-bottom: 24px; }
+        .settings-section h3 {
+            font-size: 0.75rem; color: var(--muted); text-transform: uppercase;
+            letter-spacing: 1.5px; margin-bottom: 12px;
+        }
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid var(--glass-b);
+        }
+        .toggle-row span { font-size: 0.88rem; }
+        .toggle {
+            width: 42px; height: 24px; border-radius: 12px;
+            background: rgba(255,255,255,0.1); position: relative; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .toggle.on { background: var(--accent); }
+        .toggle::after {
+            content: ''; position: absolute; width: 18px; height: 18px;
+            border-radius: 50%; background: white; top: 3px; left: 3px;
+            transition: transform 0.3s;
+        }
+        .toggle.on::after { transform: translateX(18px); }
+
+        /* Code Sandbox */
+        #sandboxCode {
+            width: 100%; height: 160px;
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-b);
+            border-radius: 12px; padding: 12px; color: #a8d8ea;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+            outline: none; resize: none;
+        }
+        .sandbox-output {
+            margin-top: 10px; padding: 12px; border-radius: 12px;
+            background: rgba(0,0,0,0.4); font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; color: var(--green); min-height: 50px;
+            white-space: pre-wrap; border: 1px solid var(--glass-b);
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex; gap: 20px; align-items: center;
+            font-size: 0.72rem; color: var(--muted);
+            padding: 0 4px;
+        }
+        .stat-item { display: flex; align-items: center; gap: 5px; }
+        .stat-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+        /* Zen mode */
+        body.zen .top-nav,
+        body.zen .quick-actions,
+        body.zen .stats-bar { opacity: 0; pointer-events: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--glass-b); border-radius: 2px; }
+
+        /* Notifications */
+        .notif-stack {
+            position: fixed; top: 80px; right: 24px; z-index: 200;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .notif {
+            padding: 12px 18px; border-radius: 12px;
+            background: rgba(10,14,25,0.95); border: 1px solid var(--glass-b);
+            font-size: 0.82rem; color: var(--text);
+            animation: notif-in 0.3s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        @keyframes notif-in {
+            from { transform: translateX(40px); opacity: 0; }
+            to { transform: none; opacity: 1; }
+        }
+
+        /* ─── FEATURES PANEL ─── */
+        .features-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            max-height: 380px; overflow-y: auto;
+        }
+        .feat-card {
+            padding: 12px 14px; border-radius: 12px;
+            background: var(--glass); border: 1px solid var(--glass-b);
+            font-size: 0.8rem;
+        }
+        .feat-card-title { font-weight: 600; margin-bottom: 4px; color: var(--accent); }
+        .feat-card-desc { color: var(--muted); font-size: 0.75rem; }
+
+        /* Learning panel */
+        .course-list { display: flex; flex-direction: column; gap: 8px; }
+        .course-item {
+            padding: 14px; border-radius: 12px;
+            background: var(--glass); border: 1px solid var(--glass-b);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .course-item:hover { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.04); }
+        .course-item h4 { font-size: 0.88rem; margin-bottom: 4px; }
+        .course-item p { font-size: 0.75rem; color: var(--muted); }
+
+        /* WiFi panel */
+        .wifi-list { display: flex; flex-direction: column; gap: 6px; }
+        .wifi-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; border-radius: 10px;
+            background: var(--glass); border: 1px solid var(--glass-b);
+            font-size: 0.82rem; cursor: pointer; transition: all 0.2s;
+        }
+        .wifi-item:hover { border-color: rgba(0,212,255,0.3); }
+        .wifi-signal { font-size: 0.7rem; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<div class="notif-stack" id="notifStack"></div>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+    <div class="logo">
+        <div class="logo-dot"></div>
+        AI OS
+    </div>
+    <div class="nav-pills">
+        <div class="nav-pill" onclick="openModal('settingsModal')">⚙ Ayarlar</div>
+        <div class="nav-pill" onclick="openModal('featuresModal')">✦ Özellikler</div>
+        <div class="nav-pill" onclick="openModal('learnModal')">🎓 Öğren</div>
+        <div class="nav-pill" onclick="openModal('wifiModal')">📶 Ağ</div>
+        <div class="nav-pill" onclick="openModal('sandboxModal')">💻 Kod</div>
+        <div class="nav-pill" onclick="toggleZen()">◎ Zen</div>
+    </div>
+    <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span id="aiStatusLabel">Çevrimiçi</span>
+    </div>
+</nav>
+
+<!-- CENTER -->
+<div class="center-zone">
+    <canvas id="orbCanvas" width="320" height="320"></canvas>
+    <div class="state-label" id="stateLabel">HAZIR</div>
+    <div class="chat-bubble-wrap">
+        <span id="responseText">Merhaba! Ben AI OS. Sana nasıl yardımcı olabilirim?</span>
+    </div>
+</div>
+
+<!-- BOTTOM BAR -->
+<div class="bottom-bar">
+    <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+            <div class="stat-dot" style="background:var(--green)"></div>
+            <span id="statBrain">Yerel AI</span>
+        </div>
+        <div class="stat-item">
+            <div class="stat-dot" style="background:var(--accent)"></div>
+            <span id="statMemory">Bellek: 0 kayıt</span>
+        </div>
+        <div class="stat-item">
+            <div class="stat-dot" style="background:var(--purple)"></div>
+            <span id="statUptime">AI OS v2.1</span>
+        </div>
+    </div>
+    <div class="quick-actions">
+        <div class="qa-pill" onclick="quickAsk('Sistemi analiz et')">🔍 Sistem</div>
+        <div class="qa-pill" onclick="quickAsk('Wi-Fi ağlarını tara')">📶 Wi-Fi</div>
+        <div class="qa-pill" onclick="quickAsk('Python örneği göster')">🐍 Kod</div>
+        <div class="qa-pill" onclick="quickAsk('Bugün ne öğrenebilirim?')">📚 Eğitim</div>
+        <div class="qa-pill" onclick="quickAsk('Kendini tanıt')">🤖 Tanıtım</div>
+        <div class="qa-pill" onclick="quickAsk('Hafızanda ne var?')">🧠 Hafıza</div>
+    </div>
+    <div class="input-row">
+        <button class="icon-btn" onclick="toggleMic()" id="micBtn" title="Sesli Komut">🎤</button>
+        <input class="msg-input" id="msgInput" type="text" placeholder="AI OS'e bir şey söyle..." autocomplete="off">
+        <button class="icon-btn" onclick="openModal('sandboxModal')" title="Kod Sandbox">⌨</button>
+        <button class="icon-btn send-btn" onclick="sendMessage()" title="Gönder">➤</button>
+    </div>
+</div>
+
+<!-- ───────── MODALS ───────── -->
+
+<!-- SETTINGS -->
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+        <div class="modal-title">⚙ Ayarlar <span class="modal-close" onclick="closeModal('settingsModal')">×</span></div>
+        
+        <div class="settings-section">
+            <h3>AI Motoru</h3>
+            <div class="form-group">
+                <label>Gemini API Anahtarı</label>
+                <input type="password" id="apiKeyInput" placeholder="AIza...">
+            </div>
+            <div class="form-group">
+                <label>Model</label>
+                <select id="modelSelect">
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Önerilen)</option>
+                    <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                    <option value="offline">Çevrimdışı SLM</option>
+                </select>
+            </div>
+            <button class="btn-primary" onclick="saveApiKey()">💾 Kaydet</button>
+        </div>
+
+        <div class="settings-section">
+            <h3>Ses & Görünüm</h3>
+            <div class="toggle-row">
+                <span>Ses Sentezi</span>
+                <div class="toggle on" id="voiceToggle" onclick="toggleSetting('voiceToggle','voice')"></div>
+            </div>
+            <div class="toggle-row">
+                <span>Efektli Ses Motoru</span>
+                <div class="toggle on" id="voiceFxToggle" onclick="toggleSetting('voiceFxToggle','voiceFx')"></div>
+            </div>
+            <div class="toggle-row">
+                <span>Orb Animasyonu</span>
+                <div class="toggle on" id="orbToggle" onclick="toggleSetting('orbToggle','orb')"></div>
+            </div>
+            <div class="toggle-row">
+                <span>Zen Modu</span>
+                <div class="toggle" id="zenToggle" onclick="toggleZen()"></div>
+            </div>
+            <div class="form-group" style="margin-top:14px;">
+                <label>Ses Hızı</label>
+                <input type="range" id="speechRate" min="0.6" max="1.4" step="0.05" value="0.92" style="border:none;background:none;padding:0;">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Kullanıcı</h3>
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="usernameInput" placeholder="Kullanıcı adı">
+            </div>
+            <button class="btn-secondary" onclick="openModal('onboardModal')">👤 Hesap Yönetimi</button>
+        </div>
+    </div>
+</div>
+
+<!-- ONBOARD / USER -->
+<div class="modal-overlay" id="onboardModal">
+    <div class="modal">
+        <div class="modal-title">👤 Hesap <span class="modal-close" onclick="closeModal('onboardModal')">×</span></div>
+        <div class="ob-tabs">
+            <div class="ob-tab active" onclick="switchObTab('guest')">🌐 Misafir</div>
+            <div class="ob-tab" onclick="switchObTab('local')">🔒 Yerel</div>
+            <div class="ob-tab" onclick="switchObTab('google')">G Google</div>
+        </div>
+        <div id="obGuest">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Misafir olarak tüm temel özelliklere erişebilirsiniz. Veriler kaydedilmez.</p>
+            <button class="btn-primary" onclick="startAsGuest()">🌐 Misafir Olarak Devam Et</button>
+        </div>
+        <div id="obLocal" style="display:none;">
+            <div class="form-group">
+                <label>Kullanıcı Adı</label>
+                <input type="text" id="localUser">
+            </div>
+            <div class="form-group">
+                <label>Şifre</label>
+                <input type="password" id="localPass">
+            </div>
+            <button class="btn-primary" onclick="createLocalAccount()">✔ Hesap Oluştur</button>
+        </div>
+        <div id="obGoogle" style="display:none;">
+            <p style="color:var(--muted);font-size:0.85rem;margin-bottom:16px;">Google hesabınızla bulut senkronizasyonu ve yedekleme alın.</p>
+            <div class="form-group">
+                <label>Google E-posta</label>
+                <input type="email" id="googleEmail" placeholder="ornek@gmail.com">
+            </div>
+            <button class="btn-primary" onclick="connectGoogle()">G Google ile Bağlan</button>
+        </div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<div class="modal-overlay" id="featuresModal">
+    <div class="modal" style="max-width:680px;">
+        <div class="modal-title">✦ 100+ Özellik <span class="modal-close" onclick="closeModal('featuresModal')">×</span></div>
+        <div class="features-grid" id="featuresGrid"></div>
+    </div>
+</div>
+
+<!-- LEARN -->
+<div class="modal-overlay" id="learnModal">
+    <div class="modal">
+        <div class="modal-title">🎓 E-Öğrenme <span class="modal-close" onclick="closeModal('learnModal')">×</span></div>
+        <div class="course-list">
+            <div class="course-item" onclick="startCourse('py101')">
+                <h4>🐍 Python 101</h4>
+                <p>Sıfırdan Python programlama — temel kavramlar, döngüler, fonksiyonlar</p>
+            </div>
+            <div class="course-item" onclick="startCourse('linux101')">
+                <h4>🐧 Linux 101</h4>
+                <p>Terminal komutları, dosya sistemi, süreç yönetimi</p>
+            </div>
+            <div class="course-item" onclick="startCourse('ai101')">
+                <h4>🤖 AI 101</h4>
+                <p>Yapay zeka temelleri, makine öğrenimi, model eğitimi</p>
+            </div>
+            <div class="course-item" onclick="startCourse('web101')">
+                <h4>🌐 Web 101</h4>
+                <p>HTML, CSS, JavaScript — modern web geliştirme</p>
+            </div>
+        </div>
+        <div id="courseContent" style="margin-top:16px;"></div>
+    </div>
+</div>
+
+<!-- WIFI -->
+<div class="modal-overlay" id="wifiModal">
+    <div class="modal">
+        <div class="modal-title">📶 Ağ Yönetimi <span class="modal-close" onclick="closeModal('wifiModal')">×</span></div>
+        <button class="btn-secondary" onclick="scanWifi()" style="margin-bottom:12px;">🔄 Ağları Tara</button>
+        <div class="wifi-list" id="wifiList"><p style="color:var(--muted);font-size:0.85rem;">Tarama başlatılmadı.</p></div>
+    </div>
+</div>
+
+<!-- SANDBOX -->
+<div class="modal-overlay" id="sandboxModal">
+    <div class="modal" style="max-width:620px;">
+        <div class="modal-title">💻 Kod Sandbox <span class="modal-close" onclick="closeModal('sandboxModal')">×</span></div>
+        <div class="form-group">
+            <label>Dil</label>
+            <select id="sandboxLang">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+            </select>
+        </div>
+        <textarea id="sandboxCode" placeholder="# Kodunuzu buraya yazın...&#10;print('AI OS Sandbox!')"></textarea>
+        <button class="btn-primary" style="margin-top:10px;" onclick="runSandbox()">▶ Çalıştır</button>
+        <div class="sandbox-output" id="sandboxOutput">// Çıktı burada görünecek</div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 1. WEBGL PLASMA ORB — Simplex Noise + Sub-Surface Scatter
+// ═══════════════════════════════════════════════════════
+
+const canvas = document.getElementById('orbCanvas');
+const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
+
+// Simplex noise in GLSL (embedded)
+const NOISE_GLSL = `
+//
+// Simplex 3D noise — Stefan Gustavson (public domain)
+//
+vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+float snoise(vec3 v) {
+  const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i = floor(v + dot(v, C.yyy));
+  vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min(g.xyz, l.zxy);
+  vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(
+    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857;
+  vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy);
+  vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x);
+  vec3 p1 = vec3(a0.zw, h.y);
+  vec3 p2 = vec3(a1.xy, h.z);
+  vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+`;
+
+const VS = `
+attribute vec3 a_pos;
+attribute vec2 a_uv;
+varying vec3 v_pos;
+varying vec2 v_uv;
+void main() {
+  v_pos = a_pos;
+  v_uv = a_uv;
+  gl_Position = vec4(a_pos * 0.92, 1.0);
+}
+`;
+
+const FS = `
+precision highp float;
+${NOISE_GLSL}
+uniform float u_time;
+uniform vec2  u_mouse;   // -1..1
+uniform float u_state;   // 0=idle 1=listen 2=think 3=speak
+varying vec3 v_pos;
+varying vec2 v_uv;
+
+// ─── Color palettes per state ───
+vec3 palette(float t, float state) {
+  // idle: deep blue-cyan plasma
+  vec3 c0a = vec3(0.02, 0.05, 0.25);
+  vec3 c0b = vec3(0.00, 0.72, 1.00);
+  vec3 c0c = vec3(0.40, 0.90, 1.00);
+  // listening: emerald green
+  vec3 c1a = vec3(0.02, 0.18, 0.12);
+  vec3 c1b = vec3(0.00, 1.00, 0.70);
+  vec3 c1c = vec3(0.60, 1.00, 0.85);
+  // thinking: purple violet
+  vec3 c2a = vec3(0.12, 0.02, 0.28);
+  vec3 c2b = vec3(0.61, 0.35, 0.97);
+  vec3 c2c = vec3(0.90, 0.70, 1.00);
+  // speaking: golden cyan
+  vec3 c3a = vec3(0.20, 0.08, 0.00);
+  vec3 c3b = vec3(1.00, 0.70, 0.00);
+  vec3 c3c = vec3(0.00, 0.90, 1.00);
+
+  float s = state;
+  vec3 ca = mix(mix(c0a,c1a,clamp(s,0.,1.)), mix(c2a,c3a,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+  vec3 cb = mix(mix(c0b,c1b,clamp(s,0.,1.)), mix(c2b,c3b,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+  vec3 cc = mix(mix(c0c,c1c,clamp(s,0.,1.)), mix(c2c,c3c,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+
+  return mix(mix(ca, cb, t), cc, t*t);
+}
+
+void main() {
+  // Sphere SDF in UV space
+  vec2 uv = v_uv * 2.0 - 1.0;
+  float r = length(uv);
+  if (r > 1.0) { gl_FragColor = vec4(0.0); return; }
+
+  // 3D sphere surface point
+  float z = sqrt(max(0.0, 1.0 - dot(uv,uv)));
+  vec3 p = normalize(vec3(uv, z));
+
+  // Mouse-reactive light dir
+  vec3 lightDir = normalize(vec3(u_mouse * 1.5, 2.0));
+  float diff = max(dot(p, lightDir), 0.0);
+
+  // ─── Noise layers for surface deformation ───
+  float speed = 0.35 + u_state * 0.25;
+  float scale1 = 2.4;
+  float scale2 = 4.8;
+  float scale3 = 9.6;
+
+  // Animate differently per state
+  float tOffset1 = u_time * speed;
+  float tOffset2 = u_time * speed * 1.37;
+  float tOffset3 = u_time * speed * 0.71;
+
+  float n1 = snoise(p * scale1 + vec3(tOffset1, 0.0, tOffset1*0.5));
+  float n2 = snoise(p * scale2 + vec3(0.0, tOffset2, tOffset2*0.3)) * 0.5;
+  float n3 = snoise(p * scale3 + vec3(tOffset3*0.8, tOffset3, 0.0)) * 0.25;
+
+  // Speaking: radial ripple
+  float ripple = 0.0;
+  if (u_state > 2.5) {
+    ripple = sin(r * 18.0 - u_time * 8.0) * 0.08 * (1.0 - r);
+  }
+
+  float noise = n1 + n2 + n3 + ripple;
+
+  // ─── Plasma base color ───
+  float ct = noise * 0.5 + 0.5;
+  vec3 col = palette(ct, u_state);
+
+  // ─── Sub-surface scattering (edge glow) ───
+  float rim = pow(1.0 - z, 2.8);
+  vec3 rimCol = mix(vec3(0.0,0.6,1.0), vec3(0.5,0.0,1.0), u_state / 3.0);
+  col += rimCol * rim * 1.6;
+
+  // ─── Specular highlight ───
+  vec3 viewDir = vec3(0.0, 0.0, 1.0);
+  vec3 halfVec = normalize(lightDir + viewDir);
+  float spec = pow(max(dot(p, halfVec), 0.0), 64.0);
+  col += vec3(1.0) * spec * 0.9;
+
+  // ─── Chromatic aberration at edges ───
+  float aberr = rim * 0.08;
+  col.r += snoise(p * 6.0 + vec3(u_time*0.1)) * aberr;
+  col.b -= snoise(p * 6.0 - vec3(u_time*0.1)) * aberr;
+
+  // ─── Diffuse shading ───
+  col *= (0.5 + diff * 0.7);
+
+  // ─── Depth-based alpha (soft sphere edge) ───
+  float alpha = smoothstep(1.0, 0.85, r);
+
+  // ─── Gamma ───
+  col = pow(clamp(col, 0.0, 1.0), vec3(0.78));
+
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+function createShader(gl, type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error('Shader error:', gl.getShaderInfoLog(s));
+    }
+    return s;
+}
+
+const prog = gl.createProgram();
+gl.attachShader(prog, createShader(gl, gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, createShader(gl, gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+// Full-screen quad
+const positions = new Float32Array([
+    -1,-1,0, 1,-1,0, 1,1,0,
+    -1,-1,0, 1,1,0, -1,1,0
+]);
+const uvs = new Float32Array([
+    0,0, 1,0, 1,1,
+    0,0, 1,1, 0,1
+]);
+const posBuf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
+const aPos = gl.getAttribLocation(prog, 'a_pos');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+
+const uvBuf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf);
+gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
+const aUv = gl.getAttribLocation(prog, 'a_uv');
+gl.enableVertexAttribArray(aUv);
+gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 0, 0);
+
+const uTime  = gl.getUniformLocation(prog, 'u_time');
+const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+const uState = gl.getUniformLocation(prog, 'u_state');
+
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.clearColor(0,0,0,0);
+
+let orbState = 0; // 0=idle 1=listen 2=think 3=speak
+let mouse = {x: 0.3, y: 0.3};
+let targetState = 0;
+
+canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left) / r.width  * 2 - 1);
+    mouse.y = -((e.clientY - r.top) / r.height * 2 - 1);
+});
+
+function setOrbState(s) {
+    targetState = s;
+    const labels = ['HAZIR','DİNLİYOR','DÜŞÜNÜYOR','KONUŞUYOR'];
+    const classes = ['','listening','thinking','speaking'];
+    document.getElementById('stateLabel').textContent = labels[s];
+    canvas.className = classes[s];
+}
+
+function lerp(a,b,t) { return a + (b-a)*t; }
+
+let startTime = performance.now();
+function render() {
+    const t = (performance.now() - startTime) / 1000;
+    orbState = lerp(orbState, targetState, 0.04);
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime, t);
+    gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.uniform1f(uState, orbState);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(render);
+}
+render();
+
+// ═══════════════════════════════════════════════════════
+// 2. MODERN VOICE ENGINE — Web Audio API + Formant Chain
+// ═══════════════════════════════════════════════════════
+
+class VoiceEngine {
+    constructor() {
+        this.ctx = null;
+        this.enabled = true;
+        this.fxEnabled = true;
+        this.rate = 0.92;
+        this.currentUtterance = null;
+        this.voices = [];
+        this.selectedVoice = null;
+        // Load voices
+        window.speechSynthesis.onvoiceschanged = () => {
+            this.voices = window.speechSynthesis.getVoices();
+            this.selectBestVoice();
+        };
+        this.voices = window.speechSynthesis.getVoices();
+        if (this.voices.length) this.selectBestVoice();
+    }
+
+    selectBestVoice() {
+        const pref = ['Tolga','Emel','Microsoft Tolga','Microsoft Emel',
+                      'Google Türkçe','tr-TR','tr'];
+        for (const p of pref) {
+            const v = this.voices.find(v => v.name.includes(p) || v.lang.startsWith('tr'));
+            if (v) { this.selectedVoice = v; break; }
+        }
+        if (!this.selectedVoice) {
+            this.selectedVoice = this.voices.find(v => v.lang.startsWith('tr')) ||
+                                 this.voices.find(v => v.default) ||
+                                 this.voices[0] || null;
+        }
+    }
+
+    initAudioContext() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    }
+
+    // Pre-process text: add natural pauses
+    processText(text) {
+        return text
+            .replace(/([.!?])\s+/g, '$1... ')
+            .replace(/,\s*/g, ', ')
+            .replace(/([;:])\s*/g, '$1 ')
+            .replace(/\n/g, '... ');
+    }
+
+    speak(text) {
+        if (!this.enabled) return;
+        window.speechSynthesis.cancel();
+        if (this.currentUtterance) this.currentUtterance = null;
+
+        const processed = this.processText(text);
+        const utter = new SpeechSynthesisUtterance(processed);
+        utter.rate = this.rate;
+        utter.pitch = 0.95;
+        utter.volume = 1.0;
+        if (this.selectedVoice) utter.voice = this.selectedVoice;
+
+        utter.onstart = () => {
+            setOrbState(3);
+            if (this.fxEnabled) this.startAudioFX();
+        };
+        utter.onend = () => {
+            setOrbState(0);
+            this.stopAudioFX();
+        };
+        utter.onerror = () => {
+            setOrbState(0);
+            this.stopAudioFX();
+        };
+
+        this.currentUtterance = utter;
+        window.speechSynthesis.speak(utter);
+    }
+
+    // Web Audio FX: chest resonance + air presence + subtle reverb
+    startAudioFX() {
+        try {
+            this.initAudioContext();
+            if (!this.ctx) return;
+
+            // Oscillator simulating chest resonance hum (very subtle, below speech)
+            this.osc = this.ctx.createOscillator();
+            this.osc.type = 'sine';
+            this.osc.frequency.value = 180; // chest resonance
+
+            const gainNode = this.ctx.createGain();
+            gainNode.gain.value = 0.025; // very subtle
+
+            // Low shelf boost (warmth)
+            const lowShelf = this.ctx.createBiquadFilter();
+            lowShelf.type = 'lowshelf';
+            lowShelf.frequency.value = 300;
+            lowShelf.gain.value = 4;
+
+            // High presence boost (air/clarity)
+            const presence = this.ctx.createBiquadFilter();
+            presence.type = 'peaking';
+            presence.frequency.value = 8000;
+            presence.gain.value = 3;
+            presence.Q.value = 1.5;
+
+            // De-esser (cut harsh sibilants)
+            const deEsser = this.ctx.createBiquadFilter();
+            deEsser.type = 'peaking';
+            deEsser.frequency.value = 7000;
+            deEsser.gain.value = -4;
+            deEsser.Q.value = 2;
+
+            // Dynamics compressor
+            const compressor = this.ctx.createDynamicsCompressor();
+            compressor.threshold.value = -18;
+            compressor.knee.value = 10;
+            compressor.ratio.value = 3;
+            compressor.attack.value = 0.003;
+            compressor.release.value = 0.15;
+
+            // Chain: osc → gain → lowShelf → presence → deEsser → compressor → dest
+            this.osc.connect(gainNode);
+            gainNode.connect(lowShelf);
+            lowShelf.connect(presence);
+            presence.connect(deEsser);
+            deEsser.connect(compressor);
+            compressor.connect(this.ctx.destination);
+
+            this.osc.start();
+            this.audioChain = { osc: this.osc, gainNode };
+
+        } catch(e) { /* graceful fallback */ }
+    }
+
+    stopAudioFX() {
+        try {
+            if (this.audioChain) {
+                this.audioChain.osc.stop();
+                this.audioChain = null;
+            }
+        } catch(e) {}
+    }
+
+    stop() { window.speechSynthesis.cancel(); this.stopAudioFX(); setOrbState(0); }
+}
+
+const voice = new VoiceEngine();
+
+// ═══════════════════════════════════════════════════════
+// 3. SPEECH RECOGNITION
+// ═══════════════════════════════════════════════════════
+
+let recognition = null;
+let isListening = false;
+
+function setupSpeechRecognition() {
+    const SRClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SRClass) return;
+    recognition = new SRClass();
+    recognition.lang = 'tr-TR';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+        isListening = true;
+        setOrbState(1);
+        document.getElementById('micBtn').classList.add('listening');
+    };
+    recognition.onresult = e => {
+        let interim = '';
+        let final_ = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            const t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) final_ += t;
+            else interim += t;
+        }
+        document.getElementById('msgInput').value = final_ || interim;
+        if (final_) {
+            stopMic();
+            processInput(final_);
+        }
+    };
+    recognition.onerror = () => stopMic();
+    recognition.onend = () => stopMic();
+}
+
+function toggleMic() {
+    if (isListening) stopMic();
+    else startMic();
+}
+
+function startMic() {
+    if (!recognition) setupSpeechRecognition();
+    if (!recognition) { notify('⚠ Tarayıcınız ses tanımayı desteklemiyor.'); return; }
+    voice.stop();
+    try { recognition.start(); } catch(e) {}
+}
+
+function stopMic() {
+    isListening = false;
+    document.getElementById('micBtn').classList.remove('listening');
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    if (orbState < 2) setOrbState(0);
+}
+
+// ═══════════════════════════════════════════════════════
+// 4. AI COMMUNICATION
+// ═══════════════════════════════════════════════════════
+
+let isProcessing = false;
+
+async function processInput(text) {
+    if (!text.trim() || isProcessing) return;
+    isProcessing = true;
+
+    document.getElementById('msgInput').value = '';
+    setResponseText('');
+    setOrbState(2); // thinking
+
+    try {
+        const res = await fetch('/api/ask', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: text, user_id: 'live'})
+        });
+        const data = await res.json();
+        const reply = data.response || 'Bir şeyler ters gitti.';
+
+        await typewriterEffect(reply);
+        voice.speak(reply);
+
+    } catch(e) {
+        const err = 'Ağ hatası oluştu. Çevrimdışı modda çalışıyorum.';
+        await typewriterEffect(err);
+        voice.speak(err);
+    }
+
+    isProcessing = false;
+}
+
+function sendMessage() {
+    const val = document.getElementById('msgInput').value.trim();
+    if (val) processInput(val);
+}
+
+function quickAsk(text) {
+    document.getElementById('msgInput').value = text;
+    processInput(text);
+}
+
+document.getElementById('msgInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// ═══════════════════════════════════════════════════════
+// 5. TYPEWRITER EFFECT
+// ═══════════════════════════════════════════════════════
+
+function setResponseText(text) {
+    document.getElementById('responseText').textContent = text;
+}
+
+async function typewriterEffect(text) {
+    const el = document.getElementById('responseText');
+    el.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+    el.appendChild(cursor);
+
+    let i = 0;
+    return new Promise(resolve => {
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                cursor.before(document.createTextNode(text[i]));
+                i++;
+            } else {
+                clearInterval(timer);
+                cursor.remove();
+                resolve();
+            }
+        }, 22);
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// 6. MODALS
+// ═══════════════════════════════════════════════════════
+
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    if (id === 'featuresModal') loadFeatures();
+}
+function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+}
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+    o.addEventListener('click', e => {
+        if (e.target === o) o.classList.remove('open');
+    });
+});
+
+// ═══════════════════════════════════════════════════════
+// 7. SETTINGS
+// ═══════════════════════════════════════════════════════
+
+function toggleSetting(toggleId, key) {
+    const el = document.getElementById(toggleId);
+    el.classList.toggle('on');
+    const on = el.classList.contains('on');
+    if (key === 'voice') voice.enabled = on;
+    if (key === 'voiceFx') voice.fxEnabled = on;
+    if (key === 'orb') canvas.style.visibility = on ? 'visible' : 'hidden';
+    notify(key + ': ' + (on ? 'Açık' : 'Kapalı'));
+}
+
+function toggleZen() {
+    document.body.classList.toggle('zen');
+    const on = document.body.classList.contains('zen');
+    document.getElementById('zenToggle').classList.toggle('on', on);
+    notify('Zen Modu: ' + (on ? 'Açık' : 'Kapalı'));
+}
+
+document.getElementById('speechRate').addEventListener('input', e => {
+    voice.rate = parseFloat(e.target.value);
+});
+
+async function saveApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    const model = document.getElementById('modelSelect').value;
+    if (!key) { notify('⚠ API anahtarı boş olamaz.'); return; }
+    try {
+        const res = await fetch('/api/settings/api-key', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({api_key: key, model: model, user_id: 'live'})
+        });
+        const d = await res.json();
+        notify(d.status === 'ok' ? '✔ API anahtarı kaydedildi.' : '⚠ Hata: ' + d.message);
+        if (d.status === 'ok') {
+            document.getElementById('aiStatusLabel').textContent = 'Gemini Aktif';
+        }
+    } catch(e) { notify('⚠ Sunucuya bağlanılamadı.'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// 8. ONBOARDING
+// ═══════════════════════════════════════════════════════
+
+function switchObTab(tab) {
+    document.querySelectorAll('.ob-tab').forEach((t,i) => {
+        t.classList.toggle('active', ['guest','local','google'][i] === tab);
+    });
+    document.getElementById('obGuest').style.display = tab==='guest' ? 'block' : 'none';
+    document.getElementById('obLocal').style.display = tab==='local' ? 'block' : 'none';
+    document.getElementById('obGoogle').style.display = tab==='google' ? 'block' : 'none';
+}
+
+function startAsGuest() {
+    closeModal('onboardModal');
+    notify('🌐 Misafir olarak devam ediliyor.');
+    voice.speak('Merhaba! Misafir olarak giriş yaptınız.');
+}
+
+async function createLocalAccount() {
+    const user = document.getElementById('localUser').value.trim();
+    const pass = document.getElementById('localPass').value;
+    if (!user || !pass) { notify('⚠ Kullanıcı adı ve şifre gerekli.'); return; }
+    try {
+        const res = await fetch('/api/onboarding/complete', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({account_type:'local', username:user, password:pass})
+        });
+        const d = await res.json();
+        notify(d.status === 'ok' ? '✔ Hesap oluşturuldu: ' + user : '⚠ ' + d.message);
+        if (d.status === 'ok') closeModal('onboardModal');
+    } catch(e) { notify('⚠ Sunucu hatası.'); }
+}
+
+function connectGoogle() {
+    const email = document.getElementById('googleEmail').value.trim();
+    if (!email) { notify('⚠ E-posta gerekli.'); return; }
+    notify('🔗 Google bağlantısı simüle edildi: ' + email);
+    voice.speak('Google hesabınız bağlandı.');
+    closeModal('onboardModal');
+}
+
+// ═══════════════════════════════════════════════════════
+// 9. FEATURES PANEL (100 özellik)
+// ═══════════════════════════════════════════════════════
+
+const FEATURES = [
+  ['🧠 Çift Beyin', 'Çevrimiçi Gemini + Çevrimdışı yerel SLM otomatik geçişi'],
+  ['🔄 Oto-Öğrenme', 'Her etkileşimden öğrenen dinamik bilgi tabanı'],
+  ['🎙 Ses Tanıma', 'Web Speech API ile Türkçe gerçek zamanlı ses tanıma'],
+  ['🔊 Formant Ses', 'Web Audio API formant filtreli gerçekçi konuşma sentezi'],
+  ['🫧 Plazma Orb', 'WebGL + Simplex Noise fotogerçekçi plazma küre'],
+  ['📶 Wi-Fi Radar', 'Ağları tara, bağlan ve yönet'],
+  ['🦷 Bluetooth', 'BT cihazlarını tara ve bağlan'],
+  ['👤 Çoklu Kullanıcı', 'Misafir, Yerel şifreli, Google hesapları'],
+  ['🎓 E-Öğrenme', '4 interaktif kurs: Python, Linux, AI, Web'],
+  ['💻 Kod Sandbox', 'Python ve JS kodu tarayıcıda çalıştır'],
+  ['🔐 AES Şifreleme', 'Kullanıcı verileri şifreli saklanır'],
+  ['⚡ OTA Güncelleme', 'Kablosuz sistem güncellemesi'],
+  ['🧬 Öz-İyileştirme', 'AI kendi hatalarından öğrenir'],
+  ['🌍 Türkçe Öncelik', 'UI ve AI yanıtları Türkçe'],
+  ['◎ Zen Modu', 'Sadece orb — saf AI deneyimi'],
+  ['⌨ Hızlı Komutlar', 'Quick-action pilları ile anında sorgular'],
+  ['📊 Sistem İstatistik', 'CPU, RAM, disk canlı izleme'],
+  ['🔑 API Yönetimi', 'Çoklu AI API anahtar saklama'],
+  ['🎨 Mood Renkleri', 'Orb duruma göre renk değiştirir'],
+  ['🖱 Mouse Işığı', 'Speküler yansıma mouse pozisyonuna göre'],
+  ['🌊 Sıvı Yüzey', 'Konuşmada dalgalanan plazma yüzeyi'],
+  ['🌀 Vortex Modu', 'Düşünürken karmaşık girdap deseni'],
+  ['💫 Rim Işığı', 'Küre kenarında sub-surface scatter efekti'],
+  ['🔬 Kromatik Sapma', 'Küre kenarında prismatik renk sapması'],
+  ['🎵 Ses Kompresörü', 'Dinamik ses aralığı normalizasyonu'],
+  ['🎼 Low Shelf Boost', 'Ses sıcaklığı için 300Hz bas yükseltme'],
+  ['🎤 Presence Boost', 'Ses netliği için 8kHz yükseltme'],
+  ['🔇 De-Esser', '7kHz sibilant kesme filtresi'],
+  ['⏸ Nefes Simülasyon', 'Konuşma öncesi doğal duraklama'],
+  ['📱 Responsive', 'Her ekran boyutuna uyumlu tasarım'],
+  ['🌙 Dark Mode', 'Koyu mod varsayılan — göz dostu'],
+  ['✨ Typewriter', 'AI yanıtları animasyonlu yazılır'],
+  ['🔔 Bildirimler', 'Anlık toast bildirim sistemi'],
+  ['🗂 Modüler UI', 'Modal tabanlı panel sistemi'],
+  ['🏃 Hız Önbellek', 'API yanıtları önbelleğe alınır'],
+  ['🔀 Intent Motor', 'NL niyet sınıflandırma (MEDIA/DEV/SYS)'],
+  ['📝 Bağlam Yönetimi', 'Konuşma tarihçesi bağlama eklenir'],
+  ['🌐 Ağ Dedektörü', 'İnternet bağlantısını otomatik algılar'],
+  ['🛡 Güvenli Komut', 'Zararlı sistem komutları engellenir'],
+  ['📦 ISO Yapı', 'Tam SquashFS + GRUB2 ISO oluşturma'],
+  ['🖥 USB Boot', 'Herhangi bir PC\'den USB ile boot'],
+  ['💾 Persistence', 'USB\'de oturum verisi kalıcı saklanır'],
+  ['🔧 Self-Healing', 'Hatalı modüller otomatik yeniden başlar'],
+  ['📡 OTA Manifest', 'Sürüm fark indirme sistemi'],
+  ['🏗 CI/CD', 'GitHub Actions otomatik ISO derleme'],
+  ['🧪 Test Suite', '13+ otomatik birim testi'],
+  ['📖 Dokümantasyon', 'Mimari, API ve yol haritası belgeleri'],
+  ['💰 Freemium Model', 'Ücretsiz temel + premium özellikler'],
+  ['🌍 Global Dağıtım', 'CDN üzerinden ISO dağıtımı'],
+  ['🤝 Topluluk', 'Açık kaynak katkı ekosistemi'],
+  ['📊 Analitik', 'Kullanım istatistikleri (anonim)'],
+  ['🎮 Oyun Modu', 'Yüksek performans kaynak tahsisi'],
+  ['🔭 Teleskop Modu', 'Derinleştirilmiş araştırma modu'],
+  ['🧮 Matematik', 'Sembolik ve sayısal hesaplama'],
+  ['📰 Haber Özeti', 'Güncel haberleri özetle'],
+  ['🌦 Hava Durumu', 'Konum tabanlı hava tahmini'],
+  ['📅 Takvim', 'Etkinlik planlama ve hatırlatıcı'],
+  ['📷 Görüntü Analiz', 'Yüklenen görselleri analiz et'],
+  ['🎥 Video İzleme', 'Video platform yönlendirmesi'],
+  ['🎵 Müzik Kontrolü', 'Müzik çalma komutları'],
+  ['📂 Dosya Yöneticisi', 'AI destekli dosya organizasyonu'],
+  ['🔍 Arama Motoru', 'Yerel ve web araması'],
+  ['🌐 Web Tarayıcı', 'Entegre mini web tarayıcı'],
+  ['💬 Çok Dil', 'Türkçe + İngilizce + 20 dil desteği'],
+  ['🤖 Bot Üretici', 'Özel AI asistan oluşturma'],
+  ['📊 Grafik Çiz', 'Veri görselleştirme araçları'],
+  ['🗺 Harita', 'Konum tabanlı harita entegrasyonu'],
+  ['📧 E-posta', 'AI destekli e-posta yönetimi'],
+  ['💬 Mesajlaşma', 'Entegre mesajlaşma panelik'],
+  ['🔗 Webhook', 'Dış servis entegrasyon noktaları'],
+  ['⚙ Plugin Sistemi', 'Modüler eklenti mimarisi'],
+  ['🏷 Etiket Sistemi', 'İçerik sınıflandırma ve filtreleme'],
+  ['🎯 Kişiselleştirme', 'Kullanıcıya özel AI davranışı'],
+  ['📈 Öğrenme Eğrisi', 'Kullanıcı yeterlilik izleme'],
+  ['🔄 Senkronizasyon', 'Bulut-yerel veri senkronizasyonu'],
+  ['🛒 Uygulama Mağazası', 'AI OS eklenti ekosistemi'],
+  ['🔐 Şifreli Bellek', 'Hassas veri AES-256 şifreleme'],
+  ['⏰ Zamanlayıcı', 'Cron tabanlı görev zamanlama'],
+  ['📡 API Hub', 'Merkezi API yönetim konsolu'],
+  ['🌊 Veri Akışı', 'Gerçek zamanlı veri akış analizi'],
+  ['🏋 Model Eğitimi', 'Yerel hafif model fine-tuning'],
+  ['🔮 Öneri Motoru', 'AI tabanlı içerik önerileri'],
+  ['🌐 P2P Paylaşım', 'Kullanıcılar arası şifreli veri paylaşımı'],
+  ['🛡 Gizlilik Modu', 'Sıfır log hava boşluklu çalışma'],
+  ['🎓 Sertifika', 'Kurs tamamlama sertifikaları'],
+  ['🤝 Mentorluk', 'AI tabanlı kişisel kodlama mentoru'],
+  ['🔤 Kod Tamamlama', 'Gerçek zamanlı kod öneri motoru'],
+  ['🐛 Hata Ayıklama', 'AI destekli otomatik debug'],
+  ['📋 Rapor Üretici', 'Otomatik analiz raporu oluştur'],
+  ['🌍 Yerelleştirme', 'Bölgeye göre dil ve format ayarı'],
+  ['🔊 Ses Tanıma++', 'Gürültü bastırmalı ses tanıma'],
+  ['💡 Fikir Üretici', 'Yaratıcı proje fikri brainstorming'],
+  ['📡 IoT Bağlantı', 'Akıllı cihaz entegrasyonu'],
+  ['🔬 Araştırma Modu', 'Derinlemesine konu araştırması'],
+  ['🚀 Hız Testi', 'Ağ ve sistem performans testi'],
+  ['🎪 Demo Modu', 'Yeni kullanıcı için interaktif tur'],
+  ['🏆 Başarı Sistemi', 'Kullanıcı ilerleme rozetleri'],
+  ['🔧 Terminal', 'Entegre güvenli terminal emülatörü'],
+  ['🌐 ISO Builder', 'Özel AI OS ISO derle ve indir'],
+];
+
+function loadFeatures() {
+    const grid = document.getElementById('featuresGrid');
+    grid.innerHTML = FEATURES.map(([title, desc]) => `
+        <div class="feat-card">
+            <div class="feat-card-title">${title}</div>
+            <div class="feat-card-desc">${desc}</div>
+        </div>
+    `).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 10. E-LEARNING
+// ═══════════════════════════════════════════════════════
+
+async function startCourse(id) {
+    try {
+        const res = await fetch(`/api/learning/course/${id}`);
+        const data = await res.json();
+        const cc = document.getElementById('courseContent');
+        cc.innerHTML = `
+            <div style="padding:16px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-b);">
+                <h3 style="margin-bottom:10px;font-size:0.95rem;">${data.title || id}</h3>
+                <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">${(data.content || data.description || 'Kurs yükleniyor...').replace(/\n/g,'<br>')}</p>
+            </div>`;
+        voice.speak(data.title + ' kursuna hoş geldiniz!');
+    } catch(e) {
+        document.getElementById('courseContent').innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">Kurs yüklenemedi.</p>';
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// 11. WI-FI
+// ═══════════════════════════════════════════════════════
+
+async function scanWifi() {
+    document.getElementById('wifiList').innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">Taranıyor...</p>';
+    try {
+        const res = await fetch('/api/wifi/list');
+        const data = await res.json();
+        const networks = data.networks || [];
+        if (!networks.length) {
+            document.getElementById('wifiList').innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">Ağ bulunamadı.</p>';
+            return;
+        }
+        document.getElementById('wifiList').innerHTML = networks.map(n => `
+            <div class="wifi-item" onclick="connectWifi('${n.ssid}')">
+                <span>${n.ssid || n.name}</span>
+                <span class="wifi-signal">📶 ${n.signal || n.strength || '-'}</span>
+            </div>
+        `).join('');
+    } catch(e) {
+        document.getElementById('wifiList').innerHTML = '<p style="color:var(--muted);font-size:0.82rem;">Ağ taraması başarısız.</p>';
+    }
+}
+
+async function connectWifi(ssid) {
+    notify('📶 ' + ssid + ' bağlanılıyor...');
+    try {
+        const res = await fetch('/api/wifi/connect', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ssid})
+        });
+        const d = await res.json();
+        notify(d.status === 'ok' ? '✔ Bağlandı: ' + ssid : '⚠ Bağlantı hatası');
+    } catch(e) { notify('⚠ Wi-Fi hatası'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// 12. CODE SANDBOX
+// ═══════════════════════════════════════════════════════
+
+async function runSandbox() {
+    const code = document.getElementById('sandboxCode').value;
+    const lang = document.getElementById('sandboxLang').value;
+    document.getElementById('sandboxOutput').textContent = '// Çalışıyor...';
+
+    if (lang === 'javascript') {
+        try {
+            const logs = [];
+            const origLog = console.log;
+            console.log = (...args) => { logs.push(args.join(' ')); origLog(...args); };
+            const result = eval(code);
+            console.log = origLog;
+            const out = logs.join('\n') + (result !== undefined ? '\n→ ' + result : '');
+            document.getElementById('sandboxOutput').textContent = out || '// (çıktı yok)';
+        } catch(e) {
+            document.getElementById('sandboxOutput').textContent = '⚠ ' + e.message;
+        }
+        return;
+    }
+
+    try {
+        const res = await fetch('/api/sandbox/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({code, language: lang})
+        });
+        const data = await res.json();
+        document.getElementById('sandboxOutput').textContent =
+            data.output || data.error || '// (çıktı yok)';
+    } catch(e) {
+        document.getElementById('sandboxOutput').textContent = '⚠ Sandbox hatası: ' + e.message;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// 13. NOTIFICATIONS
+// ═══════════════════════════════════════════════════════
+
+function notify(msg, duration=3500) {
+    const stack = document.getElementById('notifStack');
+    const el = document.createElement('div');
+    el.className = 'notif';
+    el.textContent = msg;
+    stack.appendChild(el);
+    setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(40px)';
+        el.style.transition = 'all 0.3s';
+        setTimeout(() => el.remove(), 300);
+    }, duration);
+}
+
+// ═══════════════════════════════════════════════════════
+// 14. STARTUP
+// ═══════════════════════════════════════════════════════
+
+async function startup() {
+    try {
+        const res = await fetch('/api/greeting');
+        const data = await res.json();
+        const msg = data.message || 'AI OS hazır!';
+        await typewriterEffect(msg);
+        // Slight delay then speak
+        setTimeout(() => voice.speak(msg), 400);
+
+        // Self-learning status
+        try {
+            const slRes = await fetch('/api/self-learning/status');
+            const sl = await slRes.json();
+            const count = sl.learned_interactions || sl.total_interactions || 0;
+            document.getElementById('statMemory').textContent = `Bellek: ${count} kayıt`;
+        } catch(e) {}
+
+        // Check if online
+        const isOnline = navigator.onLine;
+        document.getElementById('statBrain').textContent = isOnline ? 'Gemini AI' : 'Yerel AI';
+        document.getElementById('aiStatusLabel').textContent = isOnline ? 'Çevrimiçi' : 'Çevrimdışı';
+
+    } catch(e) {
+        await typewriterEffect('AI OS başlatıldı. Sunucu bağlantısı kontrol ediliyor...');
+    }
+}
+
+// Auto-refresh self-learning stats every 30s
+setInterval(async () => {
+    try {
+        const res = await fetch('/api/self-learning/status');
+        const d = await res.json();
+        document.getElementById('statMemory').textContent =
+            `Bellek: ${d.learned_interactions || d.total_interactions || 0} kayıt`;
+    } catch(e) {}
+}, 30000);
+
+startup();
+</script>
+</body>
+</html>

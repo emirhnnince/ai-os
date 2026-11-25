@@ -1,0 +1,15 @@
+{
+  "version": "2.1.0",
+  "codename": "Plasma Core",
+  "release_date": "2026-11-25",
+  "release_notes": "WebGL Fotogerçekçi Plazma Küre, Formant Ses Motoru, Kendi Kendini Geliştiren Hafıza ve Çoklu Kullanıcı Kurulum Sihirbazı.",
+  "squashfs_size_bytes": 0,
+  "sha256": "pending-ci-build",
+  "iso_size_bytes": 0,
+  "iso_sha256": "pending-ci-build",
+  "image_url": "https://github.com/emirhnnince/ai-os/releases/download/v2.1.0/filesystem.squashfs",
+  "iso_url": "https://github.com/emirhnnince/ai-os/releases/download/v2.1.0/ai-os-v2.1.0-amd64.iso",
+  "usb_windows_url": "https://raw.githubusercontent.com/emirhnnince/ai-os/main/scripts/usb/Write-AIOS-USB.ps1",
+  "usb_linux_url": "https://raw.githubusercontent.com/emirhnnince/ai-os/main/scripts/usb/create_live_usb.py",
+  "minimum_compatible_version": "0.1.0"
+}

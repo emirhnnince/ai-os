@@ -1,0 +1,17 @@
+{
+    "live_boot": {
+        "persistence_label": "AIOS-DATA",
+        "squashfs_slot": "A",
+        "overlay_mode": "union"
+    },
+    "users": {
+        "multiuser_enabled": true,
+        "default_user": "live",
+        "encryption": "LUKS"
+    },
+    "display": {
+        "compositor": "sway",
+        "shell": "aios-agentic-shell",
+        "kiosk_mode": false
+    }
+}

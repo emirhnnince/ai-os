@@ -1,0 +1,22 @@
+# AI-OS Çekirdek ve Arayüz Bağımlılıkları
+# Minimum kaynak tüketimi ve yüksek performans için optimize edilmiştir
+
+# Web & API Sunucusu (Live Server & Kiosk Arayüzü)
+fastapi>=0.110.0
+uvicorn>=0.28.0
+websockets>=12.0
+jinja2>=3.1.3
+python-multipart>=0.0.9
+
+# Veri & Şifreleme
+pydantic>=2.6.0
+cryptography>=42.0.0
+
+# Sistem ve Donanım İzleme
+psutil>=5.9.8
+
+# Zengin Terminal Arayüzü (TUI)
+rich>=13.7.0
+
+# Test
+pytest>=8.0.0

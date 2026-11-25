@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.env
+data/users/
+data/memory/
+config/setup_state.json
+*.iso
+*.squashfs
+.DS_Store

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI OS — Taşınabilir Yapay Zeka İşletim Sistemi | Resmi İndirme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070e;
+            --surface: rgba(255,255,255,0.035);
+            --border: rgba(255,255,255,0.08);
+            --text: #f0f4ff;
+            --muted: #8a9bb8;
+            --accent: #00d4ff;
+            --purple: #9b59f7;
+            --green: #00ffb3;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(ellipse 70% 45% at 50% 0%, rgba(0,212,255,0.10) 0%, transparent 65%),
+                radial-gradient(ellipse 45% 40% at 85% 35%, rgba(155,89,247,0.08) 0%, transparent 65%);
+        }
+        a { color: inherit; text-decoration: none; }
+        .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+        /* Header */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 24px 0; border-bottom: 1px solid var(--border);
+        }
+        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; }
+        .brand-orb {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--accent), var(--purple));
+            box-shadow: 0 0 14px var(--accent);
+        }
+        .nav-links { display: flex; gap: 24px; font-size: 0.9rem; color: var(--muted); }
+        .nav-links a:hover { color: var(--accent); }
+
+        /* Hero */
+        .hero {
+            text-align: center; padding: 80px 0 60px;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px; border-radius: 50px;
+            background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
+            color: var(--accent); font-size: 0.8rem; font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800; letter-spacing: -1px; line-height: 1.15;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent) 70%, var(--purple) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            max-width: 680px; margin: 0 auto 36px;
+            color: var(--muted); font-size: 1.08rem;
+        }
+        .cta-row {
+            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+        }
+        .btn-primary {
+            padding: 15px 28px; border-radius: 14px; font-weight: 700; font-size: 0.98rem;
+            background: linear-gradient(135deg, #00aaff, #9b59f7);
+            color: #fff; border: none; cursor: pointer;
+            box-shadow: 0 8px 30px rgba(0,170,255,0.28);
+            transition: transform 0.2s, opacity 0.2s;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); opacity: 0.92; }
+        .btn-secondary {
+            padding: 15px 26px; border-radius: 14px; font-weight: 600; font-size: 0.95rem;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--text); cursor: pointer; transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .btn-secondary:hover { border-color: rgba(0,212,255,0.35); color: var(--accent); }
+
+        /* Release Card */
+        .release-box {
+            margin: 40px auto 0; max-width: 760px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 24px 28px; text-align: left;
+            backdrop-filter: blur(12px);
+        }
+        .release-top {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 12px;
+        }
+        .release-ver { font-weight: 700; font-size: 1.05rem; color: var(--green); }
+        .release-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+        .release-notes { font-size: 0.92rem; color: #cfd8eb; margin-bottom: 14px; }
+        .sha-box {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+            padding: 10px 14px; border-radius: 10px; color: var(--muted);
+            word-break: break-all;
+        }
+
+        /* Section */
+        .section { padding: 64px 0; }
+        .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
+        .section-sub { color: var(--muted); text-align: center; margin-bottom: 40px; font-size: 0.95rem; }
+
+        /* Grid */
+        .grid-3 {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 18px; padding: 24px;
+            transition: border-color 0.25s, transform 0.25s;
+        }
+        .card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); }
+        .card-icon { font-size: 1.6rem; margin-bottom: 12px; }
+        .card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+        .card p { font-size: 0.88rem; color: var(--muted); }
+
+        /* Steps */
+        .code-block {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--accent);
+            overflow-x: auto;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 32px 0; text-align: center; color: var(--muted); font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="brand">
+            <div class="brand-orb"></div>
+            AI OS
+        </div>
+        <nav class="nav-links">
+            <a href="#features">Özellikler</a>
+            <a href="#usb-guide">USB Kurulum</a>
+            <a href="#ota">OTA Güncelleme</a>
+            <a href="/manifest.json" target="_blank">manifest.json</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="badge" id="versionBadge">● Sürüm Yükleniyor...</div>
+        <h1>Cebinizde Taşıdığınız<br>Yapay Zeka İşletim Sistemi</h1>
+        <p>
+            USB belleğinize kurun, dünyanın herhangi bir bilgisayarını kendi AI işletim sisteminize dönüştürün.
+            İnternet yokken yerel SLM, internete bağlandığınızda Google Gemini ile çalışan fotogerçekçi plazma arayüzlü Linux Live OS.
+        </p>
+        <div class="cta-row">
+            <a id="isoDownloadBtn" href="#" class="btn-primary">⬇ AI OS Live ISO İndir (64-bit)</a>
+            <a id="usbWinBtn" href="#" class="btn-secondary">💾 Windows USB Hazırlayıcı (.ps1)</a>
+            <a id="usbLinuxBtn" href="#" class="btn-secondary">🐧 Linux USB Yazıcı (.py)</a>
+        </div>
+
+        <div class="release-box">
+            <div class="release-top">
+                <span class="release-ver" id="releaseVer">AI OS v2.1.0 — Plasma Core</span>
+                <span class="release-meta" id="releaseDate">Yayın Tarihi: 2026-11-25</span>
+            </div>
+            <div class="release-notes" id="releaseNotes">Sürüm notları yükleniyor...</div>
+            <div class="sha-box" id="releaseSha">SHA-256: Yükleniyor...</div>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <h2 class="section-title">Neden AI OS?</h2>
+        <p class="section-sub">Klasik masaüstü yerine tamamen doğal dil, ses ve kendi kendini geliştiren yapay zeka çekirdeği.</p>
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon">🫧</div>
+                <h3>WebGL Plazma Küre & Doğal Ses</h3>
+                <p>Simplex 3D gürültü ile canlı plazma yüzeyi, Web Audio API formant filtreli Türkçe ses sentezi ve anlık sesli komut.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <h3>Çift Beyin + Oto-Öğrenme</h3>
+                <p>Çevrimdışı yerel SLM ve çevrimiçi Gemini 2.0 arasında otomatik geçiş. Her konuşmadan öğrenen kalıcı hafıza.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🔐</div>
+                <h3>Çoklu Kullanıcı & Persistence</h3>
+                <p>Misafir, şifreli Yerel hesap veya Google girişi. Tüm ayarlarınız ve projeleriniz USB belleğinizde şifreli saklanır.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">🎓</div>
+                <h3>Dahili E-Eğitim & Kod Sandbox</h3>
+                <p>Python, Linux, AI ve Web dersleri ile sıfırdan yazılım öğrenin; dahili sandbox ile kodunuzu anında çalıştırın.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">📡</div>
+                <h3>Wi-Fi Radar & Bluetooth</h3>
+                <p>Live USB ortamında donanım taraması, hızlı ağ bağlantısı, Wi-Fi QR paylaşımı ve pil telemetrisi.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Atomik A/B OTA Güncelleme</h3>
+                <p>Yeni sürüm yayınlandığında tüm AI OS kullanıcıları tek tıkla veri kaybı olmadan SquashFS güncellemesi alır.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="usb-guide">
+        <h2 class="section-title">3 Adımda USB Live Kurulumu</h2>
+        <p class="section-sub">Herhangi bir bilgisayarda USB'den başlatın (UEFI & Legacy BIOS destekli).</p>
+        <div class="grid-3">
+            <div class="card">
+                <h3>1. ISO veya USB Aracını İndirin</h3>
+                <p>Yukarıdan <strong>AI OS Live ISO</strong> dosyasını indirin veya Windows/Linux USB hazırlama aracını alın.</p>
+            </div>
+            <div class="card">
+                <h3>2. USB Belleğe Yazdırın</h3>
+                <p>Windows'ta PowerShell aracımızı veya Rufus/Etcher kullanın (en az 8 GB USB önerilir):</p>
+                <div class="code-block">.\Write-AIOS-USB.ps1 -IsoPath .\ai-os.iso</div>
+            </div>
+            <div class="card">
+                <h3>3. USB'den Boot Edin</h3>
+                <p>PC açılışında Boot Menüsünden (F12/F11/ESC) USB belleğinizi seçin ve <strong>AI OS Persistence</strong> moduyla başlayın.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="ota">
+        <h2 class="section-title">Sürüm Güncelleme (OTA) Mimarisi</h2>
+        <p class="section-sub">Bu web sitesi aynı zamanda AI OS işletim sistemlerinin resmi güncelleme sunucusudur.</p>
+        <div class="release-box">
+            <p style="font-size:0.9rem;color:var(--muted);margin-bottom:10px;">
+                AI OS içindeki <code>OTAUpdater</code> doğrudan bu sitedeki <code>/manifest.json</code> uç noktasını kontrol eder.
+                GitHub Actions üzerinden yeni bir sürüm derlendiğinde manifest güncellenir ve tüm kurulu USB sistemler otomatik olarak yeni sürümü görür.
+            </p>
+            <div class="code-block">GET https://&lt;vercel-domain&gt;/manifest.json → SHA-256 Doğrulama → A/B SquashFS Güncelleme</div>
+        </div>
+    </section>
+
+    <footer>
+        AI OS © 2026 — Özgür, Taşınabilir, Kendi Kendini Geliştiren Yapay Zeka İşletim Sistemi
+    </footer>
+</div>
+
+<script>
+async function loadManifest() {
+    try {
+        const res = await fetch('manifest.json?_=' + Date.now());
+        const m = await res.json();
+        document.getElementById('versionBadge').textContent = `● Güncel Sürüm: v${m.version} (${m.codename || 'Live'})`;
+        document.getElementById('releaseVer').textContent = `AI OS v${m.version} — ${m.codename || 'Live'}`;
+        document.getElementById('releaseDate').textContent = `Yayın Tarihi: ${m.release_date}`;
+        document.getElementById('releaseNotes').textContent = m.release_notes;
+        document.getElementById('releaseSha').textContent = `ISO SHA-256: ${m.iso_sha256 || m.sha256}`;
+        if (m.iso_url) document.getElementById('isoDownloadBtn').href = m.iso_url;
+        if (m.usb_windows_url) document.getElementById('usbWinBtn').href = m.usb_windows_url;
+        if (m.usb_linux_url) document.getElementById('usbLinuxBtn').href = m.usb_linux_url;
+    } catch (e) {
+        document.getElementById('versionBadge').textContent = '● AI OS v2.1.0 Live';
+    }
+}
+loadManifest();
+</script>
+</body>
+</html>
