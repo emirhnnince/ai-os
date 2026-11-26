@@ -160,31 +160,10 @@ mksquashfs "$CHROOT_DIR" "$ISO_DIR/live/filesystem.squashfs" -comp xz -b 1048576
 # GRUB ve EFI Önyükleyici Yapılandırmasını Kopyala
 cp "$PROJECT_ROOT/iso_root/boot/grub/grub.cfg" "$ISO_DIR/boot/grub/grub.cfg"
 
-# 8. Hibrit Bootable ISO Dosyasını Derle (xorriso)
+# 8. Hibrit Bootable ISO Dosyasını Derle (grub-mkrescue)
 echo "[7/7] UEFI & Legacy BIOS uyumlu hibrit bootable ISO oluşturuluyor..."
-xorriso -as mkisofs \
-    -iso-level 3 \
-    -full-iso9660-filenames \
-    -volid "AIOS_LIVE" \
-    -output "$OUTPUT_ISO" \
-    -eltorito-boot boot/grub/bios.img \
-    -no-emul-boot \
-    -boot-load-size 4 \
-    -boot-info-table \
-    --eltorito-catalog boot/grub/boot.cat \
-    -eltorito-alt-boot \
-    -e EFI/BOOT/BOOTX64.EFI \
-    -no-emul-boot \
-    -isohybrid-gpt-basdat \
-    "$ISO_DIR" 2>/dev/null || {
-        # Sadeleştirilmiş xorriso komutu
-        xorriso -as mkisofs \
-            -r -V "AIOS_LIVE" \
-            -J -l -b isolinux/isolinux.bin \
-            -c isolinux/boot.cat \
-            -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -o "$OUTPUT_ISO" "$ISO_DIR"
-    }
+grub-mkrescue -o "$OUTPUT_ISO" "$ISO_DIR" -- -volid "AIOS_LIVE"
+cp "$ISO_DIR/live/filesystem.squashfs" "$PROJECT_ROOT/filesystem.squashfs"
 
 echo "=================================================================="
 echo " 🎉 İŞLEM TAMAMLANDI! Önyüklenebilir İşletim Sistemi İmajı Hazır:"

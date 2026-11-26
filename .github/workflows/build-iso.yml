@@ -25,13 +25,14 @@ jobs:
 
       - name: OTA Sürüm Manifestini Güncelle
         run: |
-          python3 src/updater/manifest_generator.py
+          python3 -c "from src.updater.manifest_generator import create_release_manifest; create_release_manifest('2.1.0', 'filesystem.squashfs', 'WebGL Fotogerçekçi Plazma Küre, Formant Ses Motoru, Kendi Kendini Geliştiren Hafıza ve Çoklu Kullanıcı Kurulum Sihirbazı.', iso_path='aios-live-v0.1-amd64.iso')"
 
       - name: ISO İmajını GitHub Release / Artifact Olarak Yükle
         uses: actions/upload-artifact@v4
         with:
           name: aios-live-iso
           path: |
-            /tmp/aios-build/*.iso
+            *.iso
+            filesystem.squashfs
             website/manifest.json
           if-no-files-found: ignore
