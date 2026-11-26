@@ -6,144 +6,507 @@
     <title>AI OS — Taşınabilir Yapay Zeka İşletim Sistemi | Resmi İndirme</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05070e;
-            --surface: rgba(255,255,255,0.035);
-            --border: rgba(255,255,255,0.08);
+            --bg: #030611;
+            --surface: rgba(255, 255, 255, 0.035);
+            --surface-hover: rgba(255, 255, 255, 0.07);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 212, 255, 0.35);
             --text: #f0f4ff;
-            --muted: #8a9bb8;
+            --text-dim: #8b9cb9;
             --accent: #00d4ff;
-            --purple: #9b59f7;
-            --green: #00ffb3;
+            --accent-purple: #9b59f7;
+            --accent-emerald: #00ffaa;
+            --glow: 0 0 35px rgba(0, 212, 255, 0.25);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
         body {
-            background: var(--bg);
+            background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(ellipse 70% 45% at 50% 0%, rgba(0,212,255,0.10) 0%, transparent 65%),
-                radial-gradient(ellipse 45% 40% at 85% 35%, rgba(155,89,247,0.08) 0%, transparent 65%);
+            position: relative;
         }
-        a { color: inherit; text-decoration: none; }
-        .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+        /* Ambient Light */
+        .ambient-glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 50% 15%, rgba(0, 212, 255, 0.09) 0%, transparent 60%),
+                radial-gradient(circle at 85% 45%, rgba(155, 89, 247, 0.07) 0%, transparent 55%),
+                radial-gradient(circle at 15% 85%, rgba(0, 255, 170, 0.05) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
 
         /* Header */
         header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 24px 0; border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.5px;
+        }
+
         .brand-orb {
-            width: 14px; height: 14px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #fff, var(--accent), var(--purple));
-            box-shadow: 0 0 14px var(--accent);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #fff, var(--accent), var(--accent-purple));
+            box-shadow: 0 0 16px var(--accent);
+            animation: pulse-orb 2.5s infinite ease-in-out;
         }
-        .nav-links { display: flex; gap: 24px; font-size: 0.9rem; color: var(--muted); }
-        .nav-links a:hover { color: var(--accent); }
+
+        @keyframes pulse-orb {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.3); opacity: 1; filter: drop-shadow(0 0 8px var(--accent)); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-badge {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
 
         /* Hero */
         .hero {
-            text-align: center; padding: 80px 0 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            padding: 70px 0 60px;
         }
-        .badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 6px 16px; border-radius: 50px;
-            background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.25);
-            color: var(--accent); font-size: 0.8rem; font-weight: 600;
-            margin-bottom: 24px;
-        }
-        .hero h1 {
-            font-size: clamp(2.2rem, 5vw, 3.8rem);
-            font-weight: 800; letter-spacing: -1px; line-height: 1.15;
-            margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffffff 30%, var(--accent) 70%, var(--purple) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .hero p {
-            max-width: 680px; margin: 0 auto 36px;
-            color: var(--muted); font-size: 1.08rem;
-        }
-        .cta-row {
-            display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
-        }
-        .btn-primary {
-            padding: 15px 28px; border-radius: 14px; font-weight: 700; font-size: 0.98rem;
-            background: linear-gradient(135deg, #00aaff, #9b59f7);
-            color: #fff; border: none; cursor: pointer;
-            box-shadow: 0 8px 30px rgba(0,170,255,0.28);
-            transition: transform 0.2s, opacity 0.2s;
-            display: inline-flex; align-items: center; gap: 10px;
-        }
-        .btn-primary:hover { transform: translateY(-2px); opacity: 0.92; }
-        .btn-secondary {
-            padding: 15px 26px; border-radius: 14px; font-weight: 600; font-size: 0.95rem;
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text); cursor: pointer; transition: all 0.2s;
-            display: inline-flex; align-items: center; gap: 10px;
-        }
-        .btn-secondary:hover { border-color: rgba(0,212,255,0.35); color: var(--accent); }
 
-        /* Release Card */
-        .release-box {
-            margin: 40px auto 0; max-width: 760px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 20px; padding: 24px 28px; text-align: left;
-            backdrop-filter: blur(12px);
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
         }
-        .release-top {
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 12px; margin-bottom: 12px;
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            color: var(--accent);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 20px;
         }
-        .release-ver { font-weight: 700; font-size: 1.05rem; color: var(--green); }
-        .release-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); }
-        .release-notes { font-size: 0.92rem; color: #cfd8eb; margin-bottom: 14px; }
-        .sha-box {
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
-            background: rgba(0,0,0,0.4); border: 1px solid var(--border);
-            padding: 10px 14px; border-radius: 10px; color: var(--muted);
+
+        .hero h1 {
+            font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+            font-weight: 800;
+            letter-spacing: -1.2px;
+            line-height: 1.12;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--accent) 75%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 1.05rem;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 900px) {
+            .cta-group {
+                justify-content: center;
+            }
+        }
+
+        .btn-main {
+            padding: 16px 30px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.98rem;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 198, 255, 0.35);
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 40px rgba(0, 198, 255, 0.45);
+        }
+
+        .btn-alt {
+            padding: 16px 26px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn-alt:hover {
+            background: var(--surface-hover);
+            border-color: var(--border-glow);
+            color: var(--accent);
+        }
+
+        /* Interactive Simulator / Orb Canvas */
+        .simulator-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 30px;
+            backdrop-filter: blur(16px);
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        #heroOrbCanvas {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            cursor: crosshair;
+            filter: drop-shadow(0 0 50px rgba(0, 212, 255, 0.45));
+            transition: filter 0.4s;
+        }
+
+        .sim-state {
+            margin-top: 18px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .sim-chat-bubble {
+            margin-top: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px 20px;
+            font-size: 0.88rem;
+            color: var(--text);
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .sim-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .sim-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.76rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sim-btn:hover, .sim-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0, 212, 255, 0.08);
+        }
+
+        /* Release Live Card */
+        .release-section {
+            padding: 30px 0 60px;
+        }
+
+        .release-panel {
+            background: linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px 36px;
+            backdrop-filter: blur(14px);
+        }
+
+        .release-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .release-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .release-title span {
+            color: var(--accent-emerald);
+            background: rgba(0, 255, 170, 0.1);
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+        }
+
+        .release-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .release-desc {
+            color: #d1d9ec;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .meta-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .meta-label {
+            color: var(--text-dim);
+            font-size: 0.72rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .meta-val {
+            color: var(--accent);
             word-break: break-all;
         }
 
-        /* Section */
-        .section { padding: 64px 0; }
-        .section-title { font-size: 1.7rem; font-weight: 700; margin-bottom: 10px; text-align: center; }
-        .section-sub { color: var(--muted); text-align: center; margin-bottom: 40px; font-size: 0.95rem; }
+        /* Features */
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
 
-        /* Grid */
-        .grid-3 {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        .section-sub {
+            text-align: center;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto 50px;
+            font-size: 0.98rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 22px;
+            margin-bottom: 80px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateY(-4px);
+            background: var(--surface-hover);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feat-icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .feature-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* USB Guides */
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-        }
-        .card {
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 18px; padding: 24px;
-            transition: border-color 0.25s, transform 0.25s;
-        }
-        .card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); }
-        .card-icon { font-size: 1.6rem; margin-bottom: 12px; }
-        .card h3 { font-size: 1.05rem; margin-bottom: 8px; }
-        .card p { font-size: 0.88rem; color: var(--muted); }
-
-        /* Steps */
-        .code-block {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--border);
-            border-radius: 12px; padding: 14px 16px; margin-top: 12px;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--accent);
-            overflow-x: auto;
+            margin-bottom: 80px;
         }
 
+        .step-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 26px;
+        }
+
+        .step-num {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.12);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: var(--accent);
+            margin-top: 14px;
+            word-break: break-all;
+        }
+
+        /* Footer */
         footer {
             border-top: 1px solid var(--border);
-            padding: 32px 0; text-align: center; color: var(--muted); font-size: 0.85rem;
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
+
+<div class="ambient-glow"></div>
+
 <div class="container">
     <header>
         <div class="brand">
@@ -152,127 +515,380 @@
         </div>
         <nav class="nav-links">
             <a href="#features">Özellikler</a>
-            <a href="#usb-guide">USB Kurulum</a>
-            <a href="#ota">OTA Güncelleme</a>
-            <a href="/manifest.json" target="_blank">manifest.json</a>
+            <a href="#simulator">Canlı Simülatör</a>
+            <a href="#downloads">İndirme</a>
+            <a href="#guide">USB Rehberi</a>
+            <span class="nav-badge" id="navVer">v2.1.0 Plasma</span>
         </nav>
     </header>
 
+    <!-- HERO -->
     <section class="hero">
-        <div class="badge" id="versionBadge">● Sürüm Yükleniyor...</div>
-        <h1>Cebinizde Taşıdığınız<br>Yapay Zeka İşletim Sistemi</h1>
-        <p>
-            USB belleğinize kurun, dünyanın herhangi bir bilgisayarını kendi AI işletim sisteminize dönüştürün.
-            İnternet yokken yerel SLM, internete bağlandığınızda Google Gemini ile çalışan fotogerçekçi plazma arayüzlü Linux Live OS.
-        </p>
-        <div class="cta-row">
-            <a id="isoDownloadBtn" href="#" class="btn-primary">⬇ AI OS Live ISO İndir (64-bit)</a>
-            <a id="usbWinBtn" href="#" class="btn-secondary">💾 Windows USB Hazırlayıcı (.ps1)</a>
-            <a id="usbLinuxBtn" href="#" class="btn-secondary">🐧 Linux USB Yazıcı (.py)</a>
-        </div>
-
-        <div class="release-box">
-            <div class="release-top">
-                <span class="release-ver" id="releaseVer">AI OS v2.1.0 — Plasma Core</span>
-                <span class="release-meta" id="releaseDate">Yayın Tarihi: 2026-11-25</span>
-            </div>
-            <div class="release-notes" id="releaseNotes">Sürüm notları yükleniyor...</div>
-            <div class="sha-box" id="releaseSha">SHA-256: Yükleniyor...</div>
-        </div>
-    </section>
-
-    <section class="section" id="features">
-        <h2 class="section-title">Neden AI OS?</h2>
-        <p class="section-sub">Klasik masaüstü yerine tamamen doğal dil, ses ve kendi kendini geliştiren yapay zeka çekirdeği.</p>
-        <div class="grid-3">
-            <div class="card">
-                <div class="card-icon">🫧</div>
-                <h3>WebGL Plazma Küre & Doğal Ses</h3>
-                <p>Simplex 3D gürültü ile canlı plazma yüzeyi, Web Audio API formant filtreli Türkçe ses sentezi ve anlık sesli komut.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🧠</div>
-                <h3>Çift Beyin + Oto-Öğrenme</h3>
-                <p>Çevrimdışı yerel SLM ve çevrimiçi Gemini 2.0 arasında otomatik geçiş. Her konuşmadan öğrenen kalıcı hafıza.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🔐</div>
-                <h3>Çoklu Kullanıcı & Persistence</h3>
-                <p>Misafir, şifreli Yerel hesap veya Google girişi. Tüm ayarlarınız ve projeleriniz USB belleğinizde şifreli saklanır.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">🎓</div>
-                <h3>Dahili E-Eğitim & Kod Sandbox</h3>
-                <p>Python, Linux, AI ve Web dersleri ile sıfırdan yazılım öğrenin; dahili sandbox ile kodunuzu anında çalıştırın.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">📡</div>
-                <h3>Wi-Fi Radar & Bluetooth</h3>
-                <p>Live USB ortamında donanım taraması, hızlı ağ bağlantısı, Wi-Fi QR paylaşımı ve pil telemetrisi.</p>
-            </div>
-            <div class="card">
-                <div class="card-icon">⚡</div>
-                <h3>Atomik A/B OTA Güncelleme</h3>
-                <p>Yeni sürüm yayınlandığında tüm AI OS kullanıcıları tek tıkla veri kaybı olmadan SquashFS güncellemesi alır.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" id="usb-guide">
-        <h2 class="section-title">3 Adımda USB Live Kurulumu</h2>
-        <p class="section-sub">Herhangi bir bilgisayarda USB'den başlatın (UEFI & Legacy BIOS destekli).</p>
-        <div class="grid-3">
-            <div class="card">
-                <h3>1. ISO veya USB Aracını İndirin</h3>
-                <p>Yukarıdan <strong>AI OS Live ISO</strong> dosyasını indirin veya Windows/Linux USB hazırlama aracını alın.</p>
-            </div>
-            <div class="card">
-                <h3>2. USB Belleğe Yazdırın</h3>
-                <p>Windows'ta PowerShell aracımızı veya Rufus/Etcher kullanın (en az 8 GB USB önerilir):</p>
-                <div class="code-block">.\Write-AIOS-USB.ps1 -IsoPath .\ai-os.iso</div>
-            </div>
-            <div class="card">
-                <h3>3. USB'den Boot Edin</h3>
-                <p>PC açılışında Boot Menüsünden (F12/F11/ESC) USB belleğinizi seçin ve <strong>AI OS Persistence</strong> moduyla başlayın.</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="section" id="ota">
-        <h2 class="section-title">Sürüm Güncelleme (OTA) Mimarisi</h2>
-        <p class="section-sub">Bu web sitesi aynı zamanda AI OS işletim sistemlerinin resmi güncelleme sunucusudur.</p>
-        <div class="release-box">
-            <p style="font-size:0.9rem;color:var(--muted);margin-bottom:10px;">
-                AI OS içindeki <code>OTAUpdater</code> doğrudan bu sitedeki <code>/manifest.json</code> uç noktasını kontrol eder.
-                GitHub Actions üzerinden yeni bir sürüm derlendiğinde manifest güncellenir ve tüm kurulu USB sistemler otomatik olarak yeni sürümü görür.
+        <div class="hero-left">
+            <div class="hero-tag">● Yeni Nesil Canlı USB Yapay Zeka İşletim Sistemi</div>
+            <h1>Cebinizde Taşıdığınız<br>Kendi Kendini Geliştiren AI</h1>
+            <p>
+                Herhangi bir bilgisayara USB belleğinizi takın ve anında başlatın.
+                İnternetsizken yerel hafif SLM, internete bağlandığında Google Gemini ile çalışan,
+                sesli ve fotogerçekçi plazma arayüzlü minimalist işletim sistemi.
             </p>
-            <div class="code-block">GET https://&lt;vercel-domain&gt;/manifest.json → SHA-256 Doğrulama → A/B SquashFS Güncelleme</div>
+            <div class="cta-group" id="downloads">
+                <a id="heroIsoBtn" href="https://github.com/emirhnnince/ai-os/releases/tag/v2.1.0" class="btn-main">
+                    ⬇ Resmi ISO İndir (v2.1.0)
+                </a>
+                <a id="heroWinBtn" href="https://raw.githubusercontent.com/emirhnnince/ai-os/main/scripts/usb/Write-AIOS-USB.ps1" class="btn-alt">
+                    💾 Windows USB Aracı (.ps1)
+                </a>
+                <a id="heroLinuxBtn" href="https://raw.githubusercontent.com/emirhnnince/ai-os/main/scripts/usb/create_live_usb.py" class="btn-alt">
+                    🐧 Linux USB Yazıcı (.py)
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-right" id="simulator">
+            <div class="simulator-box">
+                <canvas id="heroOrbCanvas" width="280" height="280"></canvas>
+                <div class="sim-state" id="simStateLabel">DURUM: HAZIR</div>
+                <div class="sim-chat-bubble" id="simChatText">
+                    "Merhaba! Ben AI OS. Cebinde taşıdığın akıllı işletim sistemiyim."
+                </div>
+                <div class="sim-controls">
+                    <button class="sim-btn active" onclick="setSimState(0)">Hazır</button>
+                    <button class="sim-btn" onclick="setSimState(1)">Dinliyor</button>
+                    <button class="sim-btn" onclick="setSimState(2)">Düşünüyor</button>
+                    <button class="sim-btn" onclick="setSimState(3)">Konuşuyor</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RELEASE PANEL -->
+    <section class="release-section">
+        <div class="release-panel">
+            <div class="release-panel-header">
+                <div class="release-title">
+                    <span id="cardCodename">Plasma Core</span>
+                    <strong id="cardVersion">AI OS v2.1.0</strong>
+                </div>
+                <div class="release-date" id="cardDate">Yayın: 2026-11-25</div>
+            </div>
+            <p class="release-desc" id="cardNotes">
+                Resmi AI OS v2.1.0 Live ISO Sürümü. WebGL Plazma Küre, Formant Ses Motoru, Çoklu Kullanıcı Kurulumu ve Canlı OTA Güncelleme.
+            </p>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">RESMİ SÜRÜM SAYFASI</span>
+                    <a class="meta-val" href="https://github.com/emirhnnince/ai-os/releases/tag/v2.1.0" target="_blank" style="text-decoration:none;">github.com/emirhnnince/ai-os/releases</a>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">OTA GÜNCELLEME ADRESİ</span>
+                    <span class="meta-val">https://ai-os-website-mu.vercel.app/manifest.json</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">MİMARİ VE UYUMLULUK</span>
+                    <span class="meta-val">x86_64 UEFI & Legacy BIOS (Hibrit)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <h2 class="section-title">Neden AI OS?</h2>
+        <p class="section-sub">Geleneksel pencereli işletim sistemlerinden farklı; ses ve yapay zeka odaklı modern çekirdek.</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feat-icon">🫧</div>
+                <h3>WebGL Plazma Küresi</h3>
+                <p>3D Simplex noise yüzey deformasyonu, fare duyarlı speküler yansıma ve konuşma durumuna göre dinamik renk değişimi.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feat-icon">🎙</div>
+                <h3>Formant Filtreli Ses Motoru</h3>
+                <p>Web Audio API ile 300Hz göğüs rezonansı, 8kHz hava varlığı ve de-esser filtreleri ile gerçekçi Türkçe ses sentezi.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feat-icon">🧠</div>
+                <h3>Çift Beyin + Kendi Kendini Geliştirme</h3>
+                <p>İnternetsiz yerel SLM ile çevrimiçi Google Gemini arasında otomatik geçiş; her kullanıcı etkileşiminden ders çıkaran otonom hafıza.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feat-icon">🔐</div>
+                <h3>Çoklu Kullanıcı & Persistence</h3>
+                <p>Misafir, şifreli Yerel hesap veya Google oturumu. USB takıldığında tüm kişisel ayarlarınız ve projeleriniz şifreli yüklenir.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feat-icon">🎓</div>
+                <h3>Dahili Kod Sandbox & Akademi</h3>
+                <p>Python, Linux, AI ve Web eğitim müfredatı ile anında kod yazıp çalıştırabileceğiniz güvenli izole sandbox ortamı.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feat-icon">⚡</div>
+                <h3>Canlı OTA Güncelleme Altyapısı</h3>
+                <p>Yeni sürümler yayınlandığında sistem tek tıkla Vercel ve GitHub üzerinden A/B yivli veri kayıpsız güncelleme alır.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- GUIDES -->
+    <section id="guide">
+        <h2 class="section-title">USB Kurulum Rehberi</h2>
+        <p class="section-sub">Sadece birkaç dakikada kendi taşınabilir AI işletim sisteminizi hazırlayın.</p>
+        <div class="guide-grid">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h4>ISO Dosyasını Alın</h4>
+                <p>Yukarıdaki bağlantıdan <code>ai-os-v2.1.0-amd64.iso</code> dosyasını indirin veya USB aracını çalıştırın.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h4>USB Belleğe Yazdırın</h4>
+                <p>Windows PowerShell'de hazırlama aracımızı çalıştırın (Rufus / BalenaEtcher de kullanabilirsiniz):</p>
+                <div class="code-snippet">.\Write-AIOS-USB.ps1 -IsoPath .\ai-os.iso</div>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h4>Boot Edin</h4>
+                <p>Bilgisayarınızı yeniden başlatıp F12 / F11 tuşuyla USB'yi seçin. AI OS anında hazır!</p>
+            </div>
         </div>
     </section>
 
     <footer>
-        AI OS © 2026 — Özgür, Taşınabilir, Kendi Kendini Geliştiren Yapay Zeka İşletim Sistemi
+        <p>AI OS © 2026 — Geliştirici: <a href="https://github.com/emirhnnince" target="_blank">Emirhan İnce (@emirhnnince)</a></p>
+        <p style="margin-top:6px; opacity:0.7;">Taşınabilir, Açık Kaynaklı, Kendi Kendini Geliştiren Canlı Yapay Zeka İşletim Sistemi</p>
     </footer>
 </div>
 
+<!-- WEBGL ORB SCRIPT -->
 <script>
+const canvas = document.getElementById('heroOrbCanvas');
+const gl = canvas.getContext('webgl', { antialias: true, alpha: true });
+
+const NOISE_GLSL = `
+vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+float snoise(vec3 v) {
+  const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i = floor(v + dot(v, C.yyy));
+  vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min(g.xyz, l.zxy);
+  vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(
+    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857;
+  vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy);
+  vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x);
+  vec3 p1 = vec3(a0.zw, h.y);
+  vec3 p2 = vec3(a1.xy, h.z);
+  vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}
+`;
+
+const VS = `
+attribute vec3 a_pos;
+attribute vec2 a_uv;
+varying vec2 v_uv;
+void main() {
+  v_uv = a_uv;
+  gl_Position = vec4(a_pos * 0.92, 1.0);
+}
+`;
+
+const FS = `
+precision highp float;
+${NOISE_GLSL}
+uniform float u_time;
+uniform vec2  u_mouse;
+uniform float u_state;
+varying vec2 v_uv;
+
+vec3 palette(float t, float state) {
+  vec3 c0a = vec3(0.02, 0.05, 0.25);
+  vec3 c0b = vec3(0.00, 0.72, 1.00);
+  vec3 c0c = vec3(0.40, 0.90, 1.00);
+
+  vec3 c1a = vec3(0.02, 0.18, 0.12);
+  vec3 c1b = vec3(0.00, 1.00, 0.70);
+  vec3 c1c = vec3(0.60, 1.00, 0.85);
+
+  vec3 c2a = vec3(0.12, 0.02, 0.28);
+  vec3 c2b = vec3(0.61, 0.35, 0.97);
+  vec3 c2c = vec3(0.90, 0.70, 1.00);
+
+  vec3 c3a = vec3(0.20, 0.08, 0.00);
+  vec3 c3b = vec3(1.00, 0.70, 0.00);
+  vec3 c3c = vec3(0.00, 0.90, 1.00);
+
+  float s = state;
+  vec3 ca = mix(mix(c0a,c1a,clamp(s,0.,1.)), mix(c2a,c3a,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+  vec3 cb = mix(mix(c0b,c1b,clamp(s,0.,1.)), mix(c2b,c3b,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+  vec3 cc = mix(mix(c0c,c1c,clamp(s,0.,1.)), mix(c2c,c3c,clamp(s-2.,0.,1.)), clamp(s-1.,0.,1.));
+
+  return mix(mix(ca, cb, t), cc, t*t);
+}
+
+void main() {
+  vec2 uv = v_uv * 2.0 - 1.0;
+  float r = length(uv);
+  if (r > 1.0) { gl_FragColor = vec4(0.0); return; }
+
+  float z = sqrt(max(0.0, 1.0 - dot(uv,uv)));
+  vec3 p = normalize(vec3(uv, z));
+  vec3 lightDir = normalize(vec3(u_mouse * 1.5, 2.0));
+  float diff = max(dot(p, lightDir), 0.0);
+
+  float speed = 0.35 + u_state * 0.25;
+  float t1 = u_time * speed;
+  float t2 = u_time * speed * 1.37;
+  float n1 = snoise(p * 2.5 + vec3(t1, 0.0, t1*0.5));
+  float n2 = snoise(p * 5.0 + vec3(0.0, t2, t2*0.3)) * 0.5;
+
+  float ripple = 0.0;
+  if (u_state > 2.5) {
+    ripple = sin(r * 18.0 - u_time * 8.0) * 0.08 * (1.0 - r);
+  }
+
+  float noise = n1 + n2 + ripple;
+  vec3 col = palette(noise * 0.5 + 0.5, u_state);
+
+  float rim = pow(1.0 - z, 2.8);
+  col += vec3(0.1, 0.7, 1.0) * rim * 1.5;
+
+  float spec = pow(max(dot(p, normalize(lightDir + vec3(0,0,1))), 0.0), 64.0);
+  col += vec3(1.0) * spec * 0.85;
+  col *= (0.55 + diff * 0.65);
+
+  float alpha = smoothstep(1.0, 0.85, r);
+  col = pow(clamp(col, 0.0, 1.0), vec3(0.8));
+
+  gl_FragColor = vec4(col, alpha);
+}
+`;
+
+function createShader(gl, type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+}
+
+const prog = gl.createProgram();
+gl.attachShader(prog, createShader(gl, gl.VERTEX_SHADER, VS));
+gl.attachShader(prog, createShader(gl, gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+const quad = new Float32Array([
+    -1,-1,0, 0,0,
+     1,-1,0, 1,0,
+     1, 1,0, 1,1,
+    -1,-1,0, 0,0,
+     1, 1,0, 1,1,
+    -1, 1,0, 0,1
+]);
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+
+const aPos = gl.getAttribLocation(prog, 'a_pos');
+const aUv = gl.getAttribLocation(prog, 'a_uv');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 20, 0);
+gl.enableVertexAttribArray(aUv);
+gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 20, 12);
+
+const uTime = gl.getUniformLocation(prog, 'u_time');
+const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+const uState = gl.getUniformLocation(prog, 'u_state');
+
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+let simOrbState = 0;
+let targetSimState = 0;
+let mouse = { x: 0.3, y: 0.3 };
+
+canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - r.left) / r.width * 2 - 1);
+    mouse.y = -((e.clientY - r.top) / r.height * 2 - 1);
+});
+
+function setSimState(s) {
+    targetSimState = s;
+    const labels = ['DURUM: HAZIR', 'DURUM: DİNLİYOR...', 'DURUM: DÜŞÜNÜYOR...', 'DURUM: KONUŞUYOR...'];
+    const texts = [
+        '"Merhaba! Ben AI OS. Cebinde taşıdığın akıllı işletim sistemiyim."',
+        '"Seni dinliyorum... Wi-Fi, kodlama, sistem kontrolü veya herhangi bir istek."',
+        '"Niyet analiz ediliyor ve en uygun yapay zeka çekirdeği çalıştırılıyor..."',
+        '"Sistem durumu nominal. CPU yükü %12, 64 GB boş bellek mevcut."'
+    ];
+    document.getElementById('simStateLabel').textContent = labels[s];
+    document.getElementById('simChatText').textContent = texts[s];
+
+    document.querySelectorAll('.sim-btn').forEach((b, idx) => {
+        b.classList.toggle('active', idx === s);
+    });
+}
+
+let startT = performance.now();
+function render() {
+    const t = (performance.now() - startT) / 1000;
+    simOrbState += (targetSimState - simOrbState) * 0.05;
+
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime, t);
+    gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.uniform1f(uState, simOrbState);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(render);
+}
+render();
+
+// Load Manifest Data dynamically
 async function loadManifest() {
     try {
         const res = await fetch('manifest.json?_=' + Date.now());
         const m = await res.json();
-        document.getElementById('versionBadge').textContent = `● Güncel Sürüm: v${m.version} (${m.codename || 'Live'})`;
-        document.getElementById('releaseVer').textContent = `AI OS v${m.version} — ${m.codename || 'Live'}`;
-        document.getElementById('releaseDate').textContent = `Yayın Tarihi: ${m.release_date}`;
-        document.getElementById('releaseNotes').textContent = m.release_notes;
-        document.getElementById('releaseSha').textContent = `ISO SHA-256: ${m.iso_sha256 || m.sha256}`;
-        if (m.iso_url) document.getElementById('isoDownloadBtn').href = m.iso_url;
-        if (m.usb_windows_url) document.getElementById('usbWinBtn').href = m.usb_windows_url;
-        if (m.usb_linux_url) document.getElementById('usbLinuxBtn').href = m.usb_linux_url;
-    } catch (e) {
-        document.getElementById('versionBadge').textContent = '● AI OS v2.1.0 Live';
-    }
+        document.getElementById('navVer').textContent = `v${m.version} ${m.codename || 'Plasma'}`;
+        document.getElementById('cardCodename').textContent = m.codename || 'Plasma Core';
+        document.getElementById('cardVersion').textContent = `AI OS v${m.version}`;
+        document.getElementById('cardDate').textContent = `Yayın: ${m.release_date}`;
+        document.getElementById('cardNotes').textContent = m.release_notes;
+    } catch(e) {}
 }
 loadManifest();
 </script>
+
 </body>
 </html>
