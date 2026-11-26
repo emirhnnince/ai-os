@@ -15,7 +15,7 @@ DEFAULT_LOCAL_MANIFEST = os.path.abspath(
 )
 UPDATE_MANIFEST_URL = os.environ.get(
     "AIOS_MANIFEST_URL",
-    "https://ai-os-download.vercel.app/manifest.json"
+    "https://ai-os-website-mu.vercel.app/manifest.json"
 )
 
 class OTAUpdater:
