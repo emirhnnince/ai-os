@@ -9,7 +9,7 @@
   "iso_sha256": "pending-ci-build",
   "image_url": "https://github.com/emirhnnince/ai-os/releases/download/v2.1.0/filesystem.squashfs",
   "iso_url": "https://github.com/emirhnnince/ai-os/releases/download/v2.1.0/ai-os-v2.1.0-amd64.iso",
-  "usb_windows_url": "https://ai-os-website-mu.vercel.app/downloads/Write-AIOS-USB.ps1",
+  "usb_windows_url": "https://ai-os-website-mu.vercel.app/downloads/AI-OS-USB-Installer.exe",
   "usb_linux_url": "https://ai-os-website-mu.vercel.app/downloads/create_live_usb.py",
   "minimum_compatible_version": "0.1.0"
 }
