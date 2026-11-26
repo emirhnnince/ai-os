@@ -632,41 +632,71 @@
 
     <!-- VIDEO TUTORIALS & GUIDES -->
     <section id="videos" style="margin-bottom: 70px;">
-        <h2 class="section-title">🎬 Canlı Kurulum Videoları & Rehberler</h2>
-        <p class="section-sub">AI OS'u ister kendi özel EXE sihirbazımızla ister popüler Rufus aracıyla dakikalar içinde kurun.</p>
+        <h2 class="section-title">🎬 Canlı Kurulum Videoları & İnteraktif Rehberler</h2>
+        <p class="section-sub">AI OS'u ister özel otomatik kurulum sihirbazımızla ister Rufus ile adım adım video simülasyonu eşliğinde kurun.</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
-            <!-- Video 1: Custom EXE Installer -->
+            <!-- Video 1: Custom EXE Installer Interactive Video Canvas -->
             <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; padding: 22px;">
-                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0, 212, 255, 0.25);">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 3rem; margin-bottom: 8px;">🚀</div>
-                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 6px;">AI OS Otomatik EXE Sihirbazı ile Kurulum</h4>
-                        <span style="font-size: 0.78rem; background: rgba(0,212,255,0.15); color: var(--accent); padding: 4px 12px; border-radius: 20px;">Önerilen Yöntem</span>
+                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #070b16; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(0, 212, 255, 0.35); box-shadow: 0 10px 30px rgba(0,0,0,0.6);" id="videoContainer1">
+                    <div style="position: absolute; top: 12px; left: 16px; display: flex; gap: 6px;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                    </div>
+                    <div id="videoScreen1" style="text-align: center; padding: 20px;">
+                        <div style="font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(0 0 16px rgba(0,212,255,0.8));">🚀</div>
+                        <h4 style="color: #fff; font-size: 1.05rem; margin-bottom: 6px;" id="video1Title">AI-OS-USB-Installer.exe Başlatılıyor</h4>
+                        <p style="color: var(--accent); font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;" id="video1Log">> ISO otomatik indiriliyor: ai-os-v2.1.0-amd64.iso</p>
+                    </div>
+                    <!-- Player Controls -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(10,14,25,0.85); padding: 8px 16px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(8px);">
+                        <button onclick="toggleVideoSim(1)" id="btnPlay1" style="background: none; border: none; color: var(--accent); font-size: 1.1rem; cursor: pointer;">▶ Oynat</button>
+                        <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
+                            <div id="videoProgress1" style="width: 35%; height: 100%; background: var(--accent); transition: width 0.3s;"></div>
+                        </div>
+                        <span style="font-size: 0.72rem; color: var(--text-dim); font-family: 'JetBrains Mono';" id="videoTime1">01:15 / 02:30</span>
                     </div>
                 </div>
                 <div style="margin-top: 18px;">
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">1. AI OS Kurulum Sihirbazı (.exe)</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">1. Otomatik EXE Sihirbazı ile Kurulum</h3>
+                        <span style="font-size: 0.75rem; background: rgba(0,212,255,0.15); color: var(--accent); padding: 3px 10px; border-radius: 12px; font-weight: 600;">1 Tıkla Hazır</span>
+                    </div>
                     <p style="color: var(--text-dim); font-size: 0.88rem; line-height: 1.6;">
-                        Windows bilgisayarınızda indirdiğiniz <code>AI-OS-USB-Installer.exe</code> dosyasını açın.
-                        ISO'yu otomatik çeker, USB belleğinizi biçimlendirir ve kalıcılık (persistence) alanını otomatik yapılandırır.
+                        İndirdiğiniz <code>AI-OS-USB-Installer.exe</code> dosyasını açın. En güncel ISO'yu otomatik çeker, USB'yi kalıcılık (persistence) ile hazırlar.
                     </p>
                 </div>
             </div>
 
-            <!-- Video 2: Rufus Manual Setup -->
+            <!-- Video 2: Rufus Manual Setup Interactive Video Canvas -->
             <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; padding: 22px;">
-                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(155, 89, 247, 0.25);">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 3rem; margin-bottom: 8px;">💿</div>
-                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 6px;">Rufus Aracı ile USB'ye Yazma</h4>
-                        <span style="font-size: 0.78rem; background: rgba(155,89,247,0.15); color: var(--accent-purple); padding: 4px 12px; border-radius: 20px;">Klasik Alternatif</span>
+                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #070b16; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid rgba(155, 89, 247, 0.35); box-shadow: 0 10px 30px rgba(0,0,0,0.6);" id="videoContainer2">
+                    <div style="position: absolute; top: 12px; left: 16px; display: flex; gap: 6px;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                    </div>
+                    <div id="videoScreen2" style="text-align: center; padding: 20px;">
+                        <div style="font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(0 0 16px rgba(155,89,247,0.8));">💿</div>
+                        <h4 style="color: #fff; font-size: 1.05rem; margin-bottom: 6px;" id="video2Title">Rufus 4.x ile GPT / UEFI Yazımı</h4>
+                        <p style="color: var(--accent-purple); font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;" id="video2Log">> Hedef: UEFI (CSM yok) · Bölüm: GPT · Dosya: FAT32</p>
+                    </div>
+                    <!-- Player Controls -->
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(10,14,25,0.85); padding: 8px 16px; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(8px);">
+                        <button onclick="toggleVideoSim(2)" id="btnPlay2" style="background: none; border: none; color: var(--accent-purple); font-size: 1.1rem; cursor: pointer;">▶ Oynat</button>
+                        <div style="flex: 1; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden;">
+                            <div id="videoProgress2" style="width: 60%; height: 100%; background: var(--accent-purple); transition: width 0.3s;"></div>
+                        </div>
+                        <span style="font-size: 0.72rem; color: var(--text-dim); font-family: 'JetBrains Mono';" id="videoTime2">02:10 / 03:45</span>
                     </div>
                 </div>
                 <div style="margin-top: 18px;">
-                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">2. Rufus ile Manuel Live USB</h3>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">2. Rufus Aracı ile Manuel Kurulum</h3>
+                        <span style="font-size: 0.75rem; background: rgba(155,89,247,0.15); color: var(--accent-purple); padding: 3px 10px; border-radius: 12px; font-weight: 600;">Geleneksel Yol</span>
+                    </div>
                     <p style="color: var(--text-dim); font-size: 0.88rem; line-height: 1.6;">
-                        Rufus'u açın, USB diskinizi seçin ve <code>ai-os-v2.1.0-amd64.iso</code> dosyasını gösterin.
-                        Bölüm düzenini <b>GPT</b>, Hedef sistemi <b>UEFI (CSM yok)</b> olarak işaretleyip Başlat'a tıklayın.
+                        Rufus'u açıp ISO dosyanızı seçin. Bölüm düzenini <b>GPT</b>, Hedef sistemi <b>UEFI</b> seçip Başlat'a basın.
                     </p>
                 </div>
             </div>
