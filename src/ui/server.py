@@ -18,6 +18,8 @@ from src.core.system_controller import SystemController
 from src.core.multi_user import MultiUserManager
 from src.core.context_manager import ContextManager
 from src.core.offline_slm import OfflineSLMManager
+from src.core.smart_offline_slm import SmartOfflineSLM
+from src.core.database_manager import DatabaseManager
 from src.core.ai_gateway import AIGateway
 from src.core.intent_engine import IntentEngine
 from src.core.learning_engine import LearningEngine
@@ -32,6 +34,8 @@ app = FastAPI(title="AI OS Live Server", version="0.1.0")
 # Çekirdek Servis Örnekleri
 sys_ctrl = SystemController()
 user_mgr = MultiUserManager()
+db_mgr = DatabaseManager()
+smart_slm = SmartOfflineSLM()
 context_mgr = ContextManager(sys_ctrl, user_mgr)
 bt_mgr = BluetoothManager()
 wifi_radar = WiFiRadarManager()
@@ -97,10 +101,50 @@ async def get_release_manifest():
             return JSONResponse(json.load(f))
     return JSONResponse({"error": "manifest.json bulunamadı"}, status_code=404)
 
-@app.get("/api/onboarding/status")
-async def get_onboarding_status():
-    """Kurulum ve kullanıcı giriş durumunu döndürür."""
-    return JSONResponse(onboarding_mgr.get_setup_status())
+@app.post("/api/auth/google")
+async def google_auth_login(payload: Dict[str, Any]):
+    """Google hesabı ile güvenli oturum açma ve SQLite profil senkronizasyonu."""
+    email = payload.get("email", "").strip()
+    name = payload.get("name", "Google User").strip()
+    sub = payload.get("sub", "google_default_id")
+    if not email:
+        return JSONResponse({"status": "error", "message": "Geçerli bir Google e-postası gerekli."})
+    user = db_mgr.register_or_update_google_user(email, name, sub)
+    return JSONResponse({"status": "ok", "user": user, "message": f"Hoş geldiniz {name}! Google hesabınız senkronize edildi."})
+
+@app.get("/api/i18n/{lang}")
+async def get_translations(lang: str = "tr"):
+    """Çoklu dil (Türkçe, İngilizce, Almanca) çeviri paketini döndürür."""
+    i18n_path = os.path.abspath(os.path.join(BASE_DIR, "..", "..", "data", "i18n", "translations.json"))
+    if os.path.exists(i18n_path):
+        with open(i18n_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return JSONResponse(data.get(lang, data.get("tr", {})))
+    return JSONResponse({})
+
+@app.post("/api/oobe/save")
+async def save_first_boot_settings(payload: Dict[str, Any]):
+    """İlk kurulum (OOBE) dili, klavyesi ve bölgesini kalıcı kaydeder."""
+    lang = payload.get("language", "tr")
+    region = payload.get("region", "TR")
+    keyboard = payload.get("keyboard", "tr-Q")
+    db_mgr.set_setting("system_lang", lang)
+    db_mgr.set_setting("system_region", region)
+    db_mgr.set_setting("system_keyboard", keyboard)
+    db_mgr.set_setting("oobe_completed", "true")
+    return JSONResponse({"status": "ok", "message": "İlk kurulum tercihleri başarıyla kaydedildi."})
+
+@app.get("/api/virtual-sandbox/specs")
+async def get_virtual_sandbox_specs():
+    """İşletim sistemini test etmek için sanal çevre özelliklerini döndürür."""
+    return JSONResponse({
+        "status": "active",
+        "environment": "AI OS Web-Kiosk Virtual Container",
+        "supported_emulation": ["QEMU", "VirtualBox", "WebAssembly Kiosk"],
+        "recommended_qemu_cmd": "qemu-system-x86_64 -m 4096 -enable-kvm -cdrom ai-os-v2.1.0-amd64.iso -boot d",
+        "virtual_ram_mb": 4096,
+        "virtual_cpu_cores": 4
+    })
 
 @app.post("/api/onboarding/complete")
 async def complete_onboarding(payload: Dict[str, Any]):

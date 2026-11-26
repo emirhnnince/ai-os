@@ -533,14 +533,14 @@
                 sesli ve fotogerçekçi plazma arayüzlü minimalist işletim sistemi.
             </p>
             <div class="cta-group" id="downloads">
-                <a id="heroIsoBtn" href="https://github.com/emirhnnince/ai-os/releases/tag/v2.1.0" class="btn-main">
-                    ⬇ Resmi ISO İndir (v2.1.0)
+                <a id="heroIsoBtn" href="https://github.com/emirhnnince/ai-os/releases/download/v2.1.0/ai-os-v2.1.0-amd64.iso" download="ai-os-v2.1.0-amd64.iso" class="btn-main">
+                    ⬇ Direkt ISO İndir (v2.1.0)
                 </a>
                 <a id="heroWinBtn" href="/downloads/AI-OS-USB-Installer.exe" download="AI-OS-USB-Installer.exe" class="btn-alt">
                     💾 Windows USB Kurulum Sihirbazı (.exe)
                 </a>
                 <a id="heroLinuxBtn" href="/downloads/create_live_usb.py" download="create_live_usb.py" class="btn-alt">
-                    🐧 Linux USB Yazıcı (.py)
+                    🐧 Direkt Linux USB Aracı (.py)
                 </a>
             </div>
         </div>
@@ -626,6 +626,49 @@
                 <div class="feat-icon">⚡</div>
                 <h3>Canlı OTA Güncelleme Altyapısı</h3>
                 <p>Yeni sürümler yayınlandığında sistem tek tıkla Vercel ve GitHub üzerinden A/B yivli veri kayıpsız güncelleme alır.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- VIDEO TUTORIALS & GUIDES -->
+    <section id="videos" style="margin-bottom: 70px;">
+        <h2 class="section-title">🎬 Canlı Kurulum Videoları & Rehberler</h2>
+        <p class="section-sub">AI OS'u ister kendi özel EXE sihirbazımızla ister popüler Rufus aracıyla dakikalar içinde kurun.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px;">
+            <!-- Video 1: Custom EXE Installer -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; padding: 22px;">
+                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0, 212, 255, 0.25);">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 8px;">🚀</div>
+                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 6px;">AI OS Otomatik EXE Sihirbazı ile Kurulum</h4>
+                        <span style="font-size: 0.78rem; background: rgba(0,212,255,0.15); color: var(--accent); padding: 4px 12px; border-radius: 20px;">Önerilen Yöntem</span>
+                    </div>
+                </div>
+                <div style="margin-top: 18px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">1. AI OS Kurulum Sihirbazı (.exe)</h3>
+                    <p style="color: var(--text-dim); font-size: 0.88rem; line-height: 1.6;">
+                        Windows bilgisayarınızda indirdiğiniz <code>AI-OS-USB-Installer.exe</code> dosyasını açın.
+                        ISO'yu otomatik çeker, USB belleğinizi biçimlendirir ve kalıcılık (persistence) alanını otomatik yapılandırır.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Video 2: Rufus Manual Setup -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; padding: 22px;">
+                <div style="position: relative; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(155, 89, 247, 0.25);">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 8px;">💿</div>
+                        <h4 style="color: #fff; font-size: 1.1rem; margin-bottom: 6px;">Rufus Aracı ile USB'ye Yazma</h4>
+                        <span style="font-size: 0.78rem; background: rgba(155,89,247,0.15); color: var(--accent-purple); padding: 4px 12px; border-radius: 20px;">Klasik Alternatif</span>
+                    </div>
+                </div>
+                <div style="margin-top: 18px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">2. Rufus ile Manuel Live USB</h3>
+                    <p style="color: var(--text-dim); font-size: 0.88rem; line-height: 1.6;">
+                        Rufus'u açın, USB diskinizi seçin ve <code>ai-os-v2.1.0-amd64.iso</code> dosyasını gösterin.
+                        Bölüm düzenini <b>GPT</b>, Hedef sistemi <b>UEFI (CSM yok)</b> olarak işaretleyip Başlat'a tıklayın.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
